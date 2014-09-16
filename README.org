@@ -1,12 +1,36 @@
-* Tasks [1/2]
-** DONE rplotsh [4/4]
-   CLOSED: [2014-09-15 Mon 20:38]
-- [X] Filename meta information
-- [X] Read into list
-- [X] Read from glob
-- [X] Read from directory
-** TODO Rplot [1/4]
-- [X] Stack
-- [ ] Line style, width
-- [ ] Marker style, size
-- [ ] Automatic legends w/ smart placement
+#+startup: content
+
+* Introduction
+This project provides a few Python libraries to easily plot ROOT
+objects.
+
+- ~rdir~ :: interface to browse multiple ROOT files.
+- ~rplot~ :: interface to plot ROOT objects.
+- ~rplotsh~ :: script to interactively browse multiple ROOT files,
+                  read objects, and plot them.
+- ~root2matplotlib~ :: ROOT to matplotlib translation layer (copied
+     from the rootpy project).
+
+
+* Tasks
+** rplotsh [0/3]
+*** TODO Plot settings
+: set grid ...
+: set linestyle | linecolour | linewidth ...
+: set stack
+: set legends ...
+*** TODO Plotting
+: plot <object> | <list>
+*** TODO List objects in memory
+: ls memory
+: mv <memobj> <tolist> 
+
+** Rplot [1/4]
+*** DONE Stack
+    CLOSED: [2014-09-16 Tue 16:22]
+*** TODO Line style, width
+*** TODO Marker style, size
+*** TODO Automatic legends w/ smart placement
+
+** root2matplotlib [0/1]
+*** TODO Translate get_limits from rootpy
