@@ -33,4 +33,4 @@ objects.
 *** TODO Automatic legends w/ smart placement
 
 ** root2matplotlib [0/1]
-*** TODO Translate get_limits from rootpy
+*** TODO Translate ~get_limits~ from rootpy
