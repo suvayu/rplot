@@ -75,6 +75,9 @@ class test_Rdir(unittest.TestCase):
 
           /tmp/test_Rdir[0,1].root:/dira/hista
           /tmp/test_Rdir[0,1].root:/dirb/histb
+          /tmp/test_Rdir[0,1].root:/dirc/histx
+          /tmp/test_Rdir[0,1].root:/dirc/dird/histy
+          /tmp/test_Rdir[0,1].root:/dirc/dird/dire/histz
           /tmp/test_Rdir[0,1].root:/hist[0,1]
 
         """
@@ -90,6 +93,14 @@ class test_Rdir(unittest.TestCase):
             rdir = f.mkdir('dirb')
             rdir.WriteTObject(ROOT.TH1C('histb', '', 10, 0, 10))
 
+            rdir = f.mkdir('dirc/dird/dire')
+            rdir.cd()
+            gDirectory.WriteTObject(ROOT.TH1C('histx', '', 10, 0, 10))
+            rdir.cd('dird')
+            gDirectory.WriteTObject(ROOT.TH1C('histy', '', 10, 0, 10))
+            rdir.cd('dird/dire')
+            gDirectory.WriteTObject(ROOT.TH1C('histz', '', 10, 0, 10))
+
             f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10))
 
         for f in self.rfiles:
@@ -104,7 +115,7 @@ class test_Rdir(unittest.TestCase):
         self.assertTrue(Rdir(self.fnames))
         self.assertRaises(TypeError, Rdir, self.rfiles)
 
-    def test_get_dir(self):
+    def test_get_dir_full(self):
         rdir_helper = Rdir(self.fnames)
         self.assertTrue(rdir_helper.get_dir('/tmp/test_Rdir1.root:/dira'))
         self.assertTrue(rdir_helper.get_dir('/tmp/test_Rdir1.root:'))
@@ -114,7 +125,16 @@ class test_Rdir(unittest.TestCase):
         # non-existent
         self.assertFalse(rdir_helper.get_dir('/tmp/test_Rdir1.root:/boohoo'))
 
-    def test_ls(self):
+    def test_get_dir_rel(self):
+        rdir_helper = Rdir(self.fnames)
+        rdir = rdir_helper.get_dir('/tmp/test_Rdir0.root:/dirc/dird/dire')
+        if rdir.cd():
+            self.assertTrue(rdir_helper.get_dir('../../'))
+            self.assertTrue(rdir_helper.get_dir('../../../'))
+        else:
+            self.fail(msg='Prep for Rdir.get_dir() with relative path failed')
+
+    def test_ls_full(self):
         rdir_helper = Rdir(self.fnames)
 
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:/dirb')
@@ -127,6 +147,22 @@ class test_Rdir(unittest.TestCase):
         keys_r = rdir_helper.files[1].GetListOfKeys()
         res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
         self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+
+    def test_ls_rel(self):
+        rdir_helper = Rdir(self.fnames)
+        rdir = rdir_helper.get_dir('/tmp/test_Rdir0.root:/dirc/dird/dire')
+        if rdir.cd():
+            keys_t = rdir_helper.ls('../../')
+            keys_r = rdir.GetDirectory('../../').GetListOfKeys()
+            res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
+            self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+
+            keys_t = rdir_helper.ls('../../../')
+            keys_r = rdir.GetDirectory('../../../').GetListOfKeys()
+            res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
+            self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        else:
+            self.fail(msg='Prep for Rdir.ls() with relative path failed')
 
     def test_ls_names(self):
         rdir_helper = Rdir(self.fnames)
