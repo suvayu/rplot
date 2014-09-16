@@ -61,7 +61,7 @@ class test_savepwd(unittest.TestCase):
             with savepwd():
                 self.dir2.cd()
                 raise KeyboardInterrupt('Testing')
-        except:
+        except KeyboardInterrupt:
             pass
         self.assertEqual(oldpwd, gDirectory.GetName())
 
