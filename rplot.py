@@ -78,6 +78,7 @@ class Rplot(object):
 
     grid = (1,1)
     size = (400, 400)
+    alpha = 0.05
     plots = []
     canvas = None
     style = True
@@ -108,7 +109,7 @@ class Rplot(object):
 
     def set_style(self, plottable, num):
         if isinstance(plottable, ROOT.TAttFill):
-            plottable.SetFillColorAlpha(self.fill_colours[num], 1-num*0.05)
+            plottable.SetFillColorAlpha(self.fill_colours[num], 1-num*self.alpha)
         if isinstance(plottable, ROOT.TAttLine):
             plottable.SetLineColor(self.line_colours[num])
         if isinstance(plottable, ROOT.TH1):
