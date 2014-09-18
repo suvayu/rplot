@@ -162,6 +162,7 @@ class Rplot(object):
                 # only for consistency with the above
                 self.plots = plots
             for i, plot in enumerate(self.plots):
+                if not plot: continue
                 self.canvas.cd(i+1)
                 if isplottable(plot):
                     if self.style:
