@@ -85,7 +85,7 @@ class Rplot(object):
     stack = False
 
     def __init__(self, xgrid=1, ygrid=1, width=None, height=None, style=None):
-        if gROOT.IsBatch() and width and height:
+        if gROOT.IsBatch() and not (width and height):
             raise ValueError('Width and height specs are compulsory in batch mode!')
         self.grid = (xgrid, ygrid)
         self.nplots = xgrid * ygrid
