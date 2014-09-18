@@ -58,11 +58,12 @@ def isplottable(plottable):
                    ROOT.TAttText, ROOT.TAttBBox2D, ROOT.TAttImage)
     return isinstance(plottable, plottable_t)
 
-def arrange_plottables(plottables, sep, reverse = False):
+def arrange(plottables, sep, reverse = False, pl_p = None):
     tmp = []
     for i in xrange(0, len(plottables), sep):
         l = plottables[i:i+2]
         if reverse: l.reverse()
+        if pl_p: pl_p(l)
         tmp.append(l)
     return tmp
 
