@@ -101,8 +101,8 @@ class Rplot(object):
         self.nplots = xgrid * ygrid
         self.size = get_optimal_size(xgrid, ygrid, width, height)
 
-    def prep_canvas(self):
-        self.canvas = ROOT.TCanvas('canvas', '', *self.size)
+    def prep_canvas(self, name = 'canvas', title = ''):
+        self.canvas = ROOT.TCanvas(name, title, *self.size)
         if self.nplots > 1:
             self.canvas.Divide(*self.grid)
         return self.canvas
