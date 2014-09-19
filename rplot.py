@@ -141,13 +141,16 @@ class Rplot(object):
 
     def draw_same(self, plot, drawopts):
         yrange = self.get_viewport(plot)
+        if isinstance(drawopts, str):
+            drawopts = [drawopts] * len(plot)
+        if len(plot) != len(drawopts):
+            print('# plottables ≠ # options!')
+            return
         for i, plottable in enumerate(plot):
             plottable.SetMinimum(yrange[0])
             plottable.SetMaximum(yrange[1])
-            if i == 0:
-                opts = drawopts
-            else:
-                opts = '{} same'.format(drawopts)
+            opts = drawopts[i]
+            if i > 0: opts = '{} same'.format(opts)
             if self.style:
                 self.set_style(plottable, i)
             plottable.Draw(opts)
@@ -162,15 +165,20 @@ class Rplot(object):
             else:
                 # only for consistency with the above
                 self.plots = plots
+            if isinstance(drawopts, str):
+                drawopts = [drawopts] * len(self.plots)
+            if len(self.plots) != len(drawopts):
+                print('# plots ≠ # options!')
+                return
             for i, plot in enumerate(self.plots):
                 if not plot: continue
                 self.canvas.cd(i+1)
                 if isplottable(plot):
                     if self.style:
                         self.set_style(plot, 0)
-                    plot.Draw(drawopts)
+                    plot.Draw(drawopts[i])
                 else:
-                    self.draw_same(plot, drawopts)
+                    self.draw_same(plot, drawopts[i])
             return self.canvas
         else:
             print(u'# plots ({}) ≠ # pads ({})!'
