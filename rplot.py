@@ -72,10 +72,10 @@ def arrange(plottables, sep, reverse = False, pl_p = None):
 class Rplot(object):
     """Plotter class for ROOT"""
 
-    fill_colours = (kRed, kAzure, kGreen, kGray+2, kMagenta, kOrange,
-                    kTeal-9, kCyan-7)
-    line_colours = (kRed+2, kAzure-6, kGreen+2, kBlack, kMagenta+2,
-                    kOrange+1, kTeal-8, kCyan+1)
+    fill_colours = (kAzure, kRed, kGray+2, kGreen, kMagenta, kOrange,
+                    kCyan-7, kTeal-9)
+    line_colours = (kAzure-6, kRed+2, kBlack, kGreen+2, kMagenta+2,
+                    kOrange+1, kCyan+1, kTeal-8)
 
     markers = (kDot, kFullDotSmall, kCircle, kFullTriangleDown,
                kFullTriangleUp, kFullCircle, kPlus, kStar, kMultiply,
@@ -94,7 +94,7 @@ class Rplot(object):
     stats = False
     stack = False
 
-    def __init__(self, xgrid=1, ygrid=1, width=None, height=None, style=None):
+    def __init__(self, xgrid=1, ygrid=1, width=None, height=None):
         if gROOT.IsBatch() and not (width and height):
             raise ValueError('Width and height specs are compulsory in batch mode!')
         self.grid = (xgrid, ygrid)
