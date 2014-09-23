@@ -93,6 +93,7 @@ class Rplot(object):
     style = True
     stats = False
     stack = False
+    shrink2fit = True
 
     def __init__(self, xgrid=1, ygrid=1, width=None, height=None):
         if gROOT.IsBatch() and not (width and height):
@@ -140,15 +141,17 @@ class Rplot(object):
         return (ymin, ymax)
 
     def draw_same(self, plot, drawopts):
-        yrange = self.get_viewport(plot)
+        if self.shrink2fit:
+            yrange = self.get_viewport(plot)
         if isinstance(drawopts, str):
             drawopts = [drawopts] * len(plot)
         if len(plot) != len(drawopts):
             print('# plottables ≠ # options!')
             return
         for i, plottable in enumerate(plot):
-            plottable.SetMinimum(yrange[0])
-            plottable.SetMaximum(yrange[1])
+            if self.shrink2fit:
+                plottable.SetMinimum(yrange[0])
+                plottable.SetMaximum(yrange[1])
             opts = drawopts[i]
             if i > 0: opts = '{} same'.format(opts)
             if self.style:
