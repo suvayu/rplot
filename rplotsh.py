@@ -254,8 +254,9 @@ class rshell(cmd.Cmd):
                 else:
                     objs = [(obj.GetName(), obj) for obj in objs]
                 self.save_obj(objs)
-            except ValueError:
-                print('Malformed command.')
+            except ValueError as err:
+                print(err)
+                print('Malformed command, or a bug!')
                 self.help_read()
         else:
             print('Nothing to read!')
