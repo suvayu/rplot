@@ -182,6 +182,7 @@ class test_Rdir(unittest.TestCase):
         rdir_helper = Rdir(self.fnames)
         objs_t = rdir_helper.read('/tmp/test_Rdir1.root')
         objs_r = [k.ReadObj() for k in rdir_helper.files[1].GetListOfKeys()]
+        # self.assertItemsEqual(objs_r, objs_t) # doesn't work'
         res = map(lambda i, j: i.GetName() == j.GetName(), objs_t, objs_r)
         self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
 
@@ -196,12 +197,10 @@ class test_Rdir(unittest.TestCase):
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
                   if ROOT.TClass.GetClass(k.GetClassName()) \
                   .InheritsFrom(ROOT.TDirectoryFile.Class())]
-        res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        self.assertItemsEqual(keys_r, keys_t)
 
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
                                 robj_p = lambda k: k.GetName().find('hist') >= 0)
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
                   if k.GetName().find('hist') >= 0]
-        res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        self.assertItemsEqual(keys_r, keys_t)
