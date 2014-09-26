@@ -58,12 +58,21 @@ def isplottable(plottable):
                    ROOT.TAttText, ROOT.TAttBBox2D, ROOT.TAttImage)
     return isinstance(plottable, plottable_t)
 
-def arrange(plottables, sep, reverse = False, pl_p = None):
+def arrange(plottables, sep, reverse = False, predicate = None):
+    """Rearrange plottables in nested structure understood by Rplot.
+
+    plottables -- flat iterable with plottables
+    sep        -- number of consecutive plottables
+                  that consitute one plot (pad)
+    reverse    -- reverse plottable order
+    predicate  -- apply predicate on each plot
+                  (list of plottables on one pad)
+    """
     tmp = []
     for i in xrange(0, len(plottables), sep):
-        l = plottables[i:i+2]
+        l = plottables[i:i+sep]
         if reverse: l.reverse()
-        if pl_p: pl_p(l)
+        if predicate: predicate(l)
         tmp.append(l)
     return tmp
 
