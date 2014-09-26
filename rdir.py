@@ -140,12 +140,10 @@ class Rdir(object):
 
         The returned list can be filtered with object type, or a
         custom filter function.  Object type can be any ROOT Class
-        that can uses the ClassDef macro in it's declaration.  The
-        custom filter function can be any function that can filter
-        using the object key.  Note that these two filtering methods
-        are mutually exclusive.  When robj_t is present, robj_p is
-        ignored; so when a custom filter function is used, robj_t
-        should be None.
+        that uses the ClassDef macro in it's declaration.  The custom
+        filter function can be any function that can filter using the
+        object key.  When these two filtering methods are combined, it
+        is equivalent to boolean AND.
 
         path   -- path specification string (see pathspec for format)
         robj_t -- ROOT object type
@@ -162,9 +160,9 @@ class Rdir(object):
         else:
             keys = rdir.GetListOfKeys()
         if robj_t:
-            robj_p = lambda key: \
-                     ROOT.TClass.GetClass(key.GetClassName()) \
-                                .InheritsFrom(robj_t.Class())
+            keys = filter(lambda key: \
+                          ROOT.TClass.GetClass(key.GetClassName()) \
+                          .InheritsFrom(robj_t.Class()), keys)
         if robj_p:
             keys = filter(robj_p, keys)
         return keys

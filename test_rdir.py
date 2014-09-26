@@ -198,3 +198,10 @@ class test_Rdir(unittest.TestCase):
                   .InheritsFrom(ROOT.TDirectoryFile.Class())]
         res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
         self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+
+        keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
+                                robj_p = lambda k: k.GetName().find('hist') >= 0)
+        keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
+                  if k.GetName().find('hist') >= 0]
+        res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
+        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
