@@ -78,7 +78,7 @@ class test_Rdir(unittest.TestCase):
           /tmp/test_Rdir[0,1].root:/dirc/histx
           /tmp/test_Rdir[0,1].root:/dirc/dird/histy
           /tmp/test_Rdir[0,1].root:/dirc/dird/dire/histz
-          /tmp/test_Rdir[0,1].root:/hist[0,1]
+          /tmp/test_Rdir[0,1].root:/hist{0,1,2}
 
         """
         self.fnames, self.rfiles = [], []
@@ -101,7 +101,9 @@ class test_Rdir(unittest.TestCase):
             rdir.cd('dird/dire')
             gDirectory.WriteTObject(ROOT.TH1C('histz', '', 10, 0, 10))
 
-            f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10))
+            map(lambda i:
+                f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10)),
+                xrange(3))
 
         for f in self.rfiles:
             f.Write()
