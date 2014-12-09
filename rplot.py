@@ -173,34 +173,40 @@ class Rplot(object):
             plottable.Draw(opts)
 
     def draw_hist(self, plots, drawopts):
-        if len(plots) % self.nplots == 0:
-            if not self.canvas:
-                self.prep_canvas()
-            if self.stack:
-                # necessary, goes out of scope otherwise
-                self.plots = self.get_stack(plots)
-            else:
-                # only for consistency with the above
-                self.plots = plots
-            if isinstance(drawopts, str):
-                drawopts = [drawopts] * len(self.plots)
-            if len(self.plots) != len(drawopts):
-                print('# plots ≠ # options!')
-                return
-            for i, plot in enumerate(self.plots):
-                if not plot: continue
-                self.canvas.cd(i+1)
-                if isplottable(plot):
-                    if self.style:
-                        self.set_style(plot, 0)
-                    plot.Draw(drawopts[i])
-                else:
-                    self.draw_same(plot, drawopts[i])
-            return self.canvas
-        else:
-            print(u'# plots ({}) ≠ # pads ({})!'
+        diff = len(plots) - self.nplots
+        if diff > 0:
+            print('# plots ({}) > # pads ({})!'
                   .format(len(plots), self.nplots))
             return
+        elif diff < 0:
+            # insert blanks
+            plots += [None] * (-diff)
+        if not self.canvas:
+            self.prep_canvas()
+        if self.stack:
+            # necessary, goes out of scope otherwise
+            self.plots = self.get_stack(plots)
+        else:
+            # only for consistency with the above
+            self.plots = plots
+        if isinstance(drawopts, str):
+            drawopts = [drawopts] * len(self.plots)
+        if len(self.plots) != len(drawopts):
+            print('# plots ({}) ≠ # options ({})!'
+                  .format(len(self.plots), len(drawopts)))
+            return
+        for i, plot in enumerate(self.plots):
+            pad = self.canvas.cd(i+1)
+            if not plot:
+                pad.Clear()
+                continue
+            if isplottable(plot):
+                if self.style:
+                    self.set_style(plot, 0)
+                plot.Draw(drawopts[i])
+            else:
+                self.draw_same(plot, drawopts[i])
+        return self.canvas
 
     def draw_graph(self, *args, **kwargs):
         """Same as draw_hist(..)."""
