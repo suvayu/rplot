@@ -76,6 +76,11 @@ def arrange(plottables, sep, reverse = False, predicate = None):
         tmp.append(l)
     return tmp
 
+def partition(l, n):
+    ll = len(l)
+    reslen = ll/n + ll % n # no of partitions + 1 (if remainder)
+    return [l[i*n : i*n+n] for i in xrange(reslen)]
+
 
 # ROOT plotter
 class Rplot(object):
