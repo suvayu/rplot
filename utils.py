@@ -107,7 +107,7 @@ def thnbincentre(hist, i, edges=False, width=False):
 try:
     import numpy as np
 
-    def thn2array(hist, err=False, asym=False, pair=False, shaped=False):
+    def thn2array(hist, err=False, asym=False, pair=False, shaped=False, overflow=False):
         """Convert ROOT histograms to numpy.array
 
            hist -- histogram to convert
@@ -117,27 +117,32 @@ try:
                    are put in a similarly shaped array in res[1]
          shaped -- return an array with appropriate dimensions, 1-D
                    array is returned normally
+       overflow -- include underflow and overflow bins
         """
         if shaped:
             xbins = hist.GetNbinsX()
             ybins = hist.GetNbinsY()
             zbins = hist.GetNbinsZ()
             # add overflow, underflow bins
-            if ybins == 1: shape = [xbins + 2]
-            elif zbins == 1: shape = [xbins + 2, ybins + 2]
-            else: shape = [xbins + 2, ybins + 2, zbins + 2]
+            overflow *= 2
+            if ybins == 1: shape = [xbins + overflow]
+            elif zbins == 1: shape = [xbins + overflow, ybins + overflow]
+            else: shape = [xbins + overflow, ybins + overflow, zbins + overflow]
         else:
             shape = [len(hist)]
+            if not overflow: shape[0] -= 2
         if err: shape.append(3 if asym else 2)
+        hiter = xrange(len(hist)) if overflow else xrange(1,len(hist)-1)
         val = np.array([thnbincontent(hist, i, err=err, asym=asym)
-                        for i in xrange(len(hist))]).reshape(*shape)
+                        for i in hiter]).reshape(*shape)
         if pair: return val
         else: return val.transpose()
 
-    def thnbins(hist, edges=False, width=False, pair=False):
+    def thnbins(hist, edges=False, width=False, pair=False, overflow=False):
         """Return histogram bin centre or edges"""
-        val = np.array([thnbincentre(hist, i, edges, width)
-                        for i in xrange(len(hist))])
+        hiter = xrange(len(hist)) if overflow else xrange(1,len(hist)-1)
+        val = np.array([thnbincentre(hist, i, edges=edges, width=width)
+                        for i in hiter])
         if pair: return val
         else: return val.transpose()
 
