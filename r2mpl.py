@@ -2,8 +2,8 @@
 
 def th12errorbar(hist, yerr=True, xerr=False, asym=True):
     """Convert 1D histogram to array appropriate for Axes.errorbar"""
-    from .utils import thnbins, thn2array
     assert (hist.GetDimension() == 1)
+    from utils import thnbins, thn2array
     xwerr = thnbins(hist, width=xerr)
     ywerr = thn2array(hist, err=yerr, asym=asym)
     res = []
