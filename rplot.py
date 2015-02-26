@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # coding=utf-8
 """Plotting interface for ROOT objects"""
 
