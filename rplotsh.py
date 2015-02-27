@@ -137,6 +137,24 @@ class rshell(cmd.Cmd):
         else:
             raise ValueError('{}: cannot access {}: No such object')
 
+    def do_lsmem(self, args):
+        """List objects read into memory"""
+        def print_objs(objs):
+            for name, obj in objs.iteritems():
+                print '{:<30}  <-  {:<}'.format(name, obj)
+        if args:
+            import shlex
+            tokens = shlex.split(args)
+            tmp = dict([(tok, self.objs[tok]) for tok in tokens])
+            if not tmp:
+                tmp = dict([(tok, self.objs[tok]) for tok in tokens])
+            print_objs(tmp)
+        else:
+            print_objs(self.objs)
+
+    def complete_lsmem(self, text, line, begidx, endidx):
+        return filter(lambda key: key.startswith(text), self.objs)
+
     def do_ls(self, args=''):
         """List contents of a directory/file. (see `pathspec')"""
         opts = self.ls_parser.parse_args(args.split())
