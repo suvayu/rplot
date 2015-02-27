@@ -19,6 +19,12 @@ def _import_args(namespace, d = {}):
         d[attr] = getattr(namespace, attr)
     return d
 
+def is_dir(key):
+    """Is it a directory key?"""
+    from ROOT import TClass, TDirectoryFile
+    return TClass.GetClass(key.GetClassName()) \
+                 .InheritsFrom(TDirectoryFile.Class())
+
 
 ## histogram utilities
 def th1fill(hist, dim=1):

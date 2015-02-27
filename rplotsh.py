@@ -29,6 +29,7 @@ from ROOT import (kDot, kPlus, kStar, kCircle, kMultiply,
                   kOpenTriangleUp, kOpenTriangleDown)
 
 from rdir import pathspec, Rdir, savepwd
+from utils import is_dir
 
 class rshell(cmd.Cmd):
     """Shell-like navigation commands for ROOT files"""
@@ -204,60 +205,49 @@ class rshell(cmd.Cmd):
         if args:
             import shlex
             tokens = shlex.split(args)
-            try:
-                # need to match or not
-                if tokens[0] == 're' or tokens[0] == 'glob':
-                    domatch = tokens[0]
-                    path = tokens[1]
-                    tokens = tokens[2:]
+            path = tokens[0]
+            if 'as' in tokens:  # destination var specified or not
+                # or 3 == len(tokens)
+                try:
+                    assert(tokens[1] == 'as')
+                    try:
+                        newobj = tokens[2]
+                    except IndexError:
+                        newobj = None
+                        # raise ValueError('Missing destination variable')
+                except AssertionError:
+                    print 'Unknown command token: {}'.format(tokens[1])
+                    print 'Will do regular read'
+            else:
+                newobj = None
+
+            # find and read objects
+            objs = self.rdir_helper.read(path, metainfo = True)
+            if not objs:        # nothing found, try glob
+                pattern = path.rsplit('/', 1)
+                if len(pattern) > 1:
+                    path, pattern = pattern[:-1], pattern[-1]
                 else:
-                    domatch = None
-                    path = tokens[0]
-                    tokens = tokens[1:]
-                # destination var specified or not
-                if tokens:
-                    if tokens[0] != 'as':
-                        raise ValueError('Unknown command option: {}'.format(tokens[1]))
-                    else:
-                        try:
-                            dest = tokens[1]
-                        except IndexError:
-                            raise ValueError('Missing destination variable')
-                else:
-                    dest = None
-                path_arg = path
-                if domatch:
-                    path, pattern = path.rsplit('/', 1)
-                    if domatch == 'glob':
-                        from fnmatch import fnmatchcase
-                        match = lambda name: fnmatchcase(name, pattern)
-                    if domatch == 're':
-                        import re
-                        match = re.compile(pattern).match
-                    # _not_dir = lambda key: not key.IsFolder() and match(key.GetName())
-                    _not_dir = lambda key: \
-                               not ROOT.TClass.GetClass(key.GetClassName()) \
-                                              .InheritsFrom(ROOT.TDirectoryFile.Class()) \
-                                              and match(key.GetName())
-                else:
-                    # _not_dir = lambda key: not key.IsFolder()
-                    _not_dir = lambda key: \
-                               not ROOT.TClass.GetClass(key.GetClassName()) \
-                                              .InheritsFrom(ROOT.TDirectoryFile.Class())
+                    path, pattern = None, pattern[0]
+                from fnmatch import fnmatchcase
+                match = lambda name: fnmatchcase(name, pattern)
+                _not_dir = lambda key: not is_dir(key) and match(key.GetName())
                 objs = self.rdir_helper.read(path, robj_p = _not_dir, metainfo = True)
-                # save read objects
-                if dest:
-                    if domatch or self.rdir_helper.get_dir(path_arg):
-                        objs = {dest : objs}
-                    else:
-                        objs = {dest : objs[0]} # only one element
+            if not objs:        # nothing found, try regex
+                import re
+                match = re.compile(pattern).match
+                _not_dir = lambda key: not is_dir(key) and match(key.GetName())
+                objs = self.rdir_helper.read(path, robj_p = _not_dir, metainfo = True)
+
+            # save read objects
+            if newobj:
+                if len(objs) > 1:
+                    objs = {newobj : objs}
                 else:
-                    objs = [(obj.GetName(), obj) for obj in objs]
-                self.save_obj(objs)
-            except ValueError as err:
-                print(err)
-                print('Malformed command, or a bug!')
-                self.help_read()
+                    objs = {newobj : objs[0]} # only one element
+            else:
+                objs = map(lambda obj: (obj.GetName(), obj), objs)
+            self.save_obj(objs)
         else:
             print('Nothing to read!')
 

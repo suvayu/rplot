@@ -165,7 +165,7 @@ class Rdir(object):
                           .InheritsFrom(robj_t.Class()), keys)
         if robj_p:
             keys = filter(robj_p, keys)
-        return keys
+        return filter(None, keys)
 
     def ls_names(self, path = None, robj_t = None, robj_p = None):
         """Return list of key(s) names in path.
