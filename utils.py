@@ -21,11 +21,16 @@ def _import_args(namespace, d={}):
     return d
 
 
+def is_type(key, rtype):
+    """Is key the ROOT type `rtype''?"""
+    from ROOT import TClass
+    return TClass.GetClass(key.GetClassName()).InheritsFrom(rtype.Class())
+
+
 def is_dir(key):
     """Is it a directory key?"""
-    from ROOT import TClass, TDirectoryFile
-    return TClass.GetClass(key.GetClassName()) \
-                 .InheritsFrom(TDirectoryFile.Class())
+    from ROOT import TDirectoryFile
+    return is_type(key, TDirectoryFile)
 
 
 # histogram utilities

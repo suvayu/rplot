@@ -83,6 +83,7 @@ class pathspec(object):
 
 from fixes import ROOT
 from ROOT import gROOT, gDirectory
+from utils import is_type
 
 
 class savepwd(object):
@@ -164,9 +165,7 @@ class Rdir(object):
         else:
             keys = rdir.GetListOfKeys()
         if robj_t:
-            keys = filter(lambda key: \
-                          ROOT.TClass.GetClass(key.GetClassName()) \
-                          .InheritsFrom(robj_t.Class()), keys)
+            keys = filter(lambda key: is_type(key, robj_t), keys)
         if robj_p:
             keys = filter(robj_p, keys)
         return filter(None, keys)
