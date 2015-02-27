@@ -10,11 +10,6 @@ optparser.add_argument('filenames', nargs='+', help='ROOT files')
 options = optparser.parse_args()
 
 
-import cmd
-class empty(cmd.Cmd):
-    def emptyline(self):
-        pass
-
 from fixes import ROOT
 from ROOT import gROOT, gSystem, gDirectory, gPad, gStyle
 # colours
@@ -28,14 +23,21 @@ from ROOT import (kDot, kPlus, kStar, kCircle, kMultiply,
                   kFullTriangleDown, kOpenCircle, kOpenSquare,
                   kOpenTriangleUp, kOpenTriangleDown)
 
-from rdir import pathspec, Rdir, savepwd
+import cmd
+from rdir import Rdir
 from utils import is_dir
+
+
+class empty(cmd.Cmd):
+    def emptyline(self):
+        pass
+
 
 class rshell(cmd.Cmd):
     """Shell-like navigation commands for ROOT files"""
 
     ls_parser = ArgumentParser()
-    ls_parser.add_argument('-l', action='store_true', dest='showtype', default=False)
+    ls_parser.add_argument('-l', action='store_true', dest='showtype')
     ls_parser.add_argument('paths', nargs='*')
 
     pwd = gROOT
@@ -49,10 +51,14 @@ class rshell(cmd.Cmd):
         while Bytes >= 1024:
             Bytes /= 1024.0
             unit += 1
-        if unit == 1: return Bytes
-        elif unit == 2: unit = 'KB'
-        elif unit == 3: unit = 'MB'
-        elif unit == 4: unit = 'GB'
+        if unit == 1:
+            return Bytes
+        elif unit == 2:
+            unit = 'KB'
+        elif unit == 3:
+            unit = 'MB'
+        elif unit == 4:
+            unit = 'GB'
         return '{:.1f}{}'.format(Bytes, unit)
 
     def add_files(self, files):
@@ -63,7 +69,7 @@ class rshell(cmd.Cmd):
             pathstr = line.split()[-1]
         else:
             pathstr = text
-        self.comp_f = map(lambda i: i.GetName() + ':', self.rdir_helper.files) # TFiles
+        self.comp_f = map(lambda i: i.GetName() + ':', self.rdir_helper.files)
         if self.pwd == gROOT and pathstr.find(':') < 0:
             completions = self.comp_f
         else:
@@ -74,12 +80,12 @@ class rshell(cmd.Cmd):
             # the colon separator.
             path = path.rstrip('/').split(':')[-1]
             if path or text.rfind('/') == 0:
-                completions = ['/'.join((path,i)) for i in completions]
+                completions = ['/'.join((path, i)) for i in completions]
             completions += self.comp_f
         if not text:
             return completions
         else:
-            return filter(lambda i : str.startswith(i, text), completions)
+            return filter(lambda i: str.startswith(i, text), completions)
 
     def precmd(self, line):
         return cmd.Cmd.precmd(self, line)
@@ -93,7 +99,7 @@ class rshell(cmd.Cmd):
         self.prompt = '{}> '.format(dirn)
         return cmd.Cmd.postcmd(self, stop, line)
 
-    def get_ls_fmt(self, showtype = False, indent = ''):
+    def get_ls_fmt(self, showtype=False, indent=''):
         if showtype:
             return indent + '{cls:<20}{fs:>8}({us:>8}) {nm}{m}'
         else:
@@ -109,16 +115,16 @@ class rshell(cmd.Cmd):
             cname = key.ClassName()
         cls = ROOT.TClass.GetClass(cname)
         if cls.InheritsFrom(ROOT.TFile.Class()):
-            print(fmt.format(cls = cname, nm = name, m = ':',
-                             fs = '-', us = '-'))
+            print(fmt.format(cls=cname, nm=name, m=':',
+                             fs='-', us='-'))
         elif cls.InheritsFrom(ROOT.TDirectoryFile.Class()):
-            print(fmt.format(cls = cname, nm = name, m = '/',
-                             fs = fsize, us = usize))
+            print(fmt.format(cls=cname, nm=name, m='/',
+                             fs=fsize, us=usize))
         else:
-            print(fmt.format(cls = cname, nm = name, m = '',
-                             fs = fsize, us = usize))
+            print(fmt.format(cls=cname, nm=name, m='',
+                             fs=fsize, us=usize))
 
-    def ls_objs(self, keys, showtype = False, indent = ''):
+    def ls_objs(self, keys, showtype=False, indent=''):
         # handle invalid keys
         if keys:
             valid = reduce(lambda i, j: i and j, keys)
@@ -173,8 +179,9 @@ class rshell(cmd.Cmd):
         pwdname = thisdir.GetName()
         while not (isinstance(thisdir, ROOT.TFile) or self.pwd == gROOT):
             thisdir = thisdir.GetDirectory('../')
-            if isinstance(thisdir, ROOT.TFile): break
-            pwdname = '/'.join((thisdir.GetName(),pwdname))
+            if isinstance(thisdir, ROOT.TFile):
+                break
+            pwdname = '/'.join((thisdir.GetName(), pwdname))
         if isinstance(self.pwd, ROOT.TFile):
             print('{}:'.format(pwdname))
         elif self.pwd == gROOT:
@@ -191,10 +198,12 @@ class rshell(cmd.Cmd):
         if not success:
             print('cd: {}: No such file or directory'.format(args))
         else:
-            if not args.strip(): gROOT.cd()
+            if not args.strip():
+                gROOT.cd()
 
     def complete_cd(self, text, line, begidx, endidx):
-        return self.completion_helper(text, line, begidx, endidx, ROOT.TDirectoryFile)
+        return self.completion_helper(text, line, begidx, endidx,
+                                      ROOT.TDirectoryFile)
 
     def save_obj(self, args):
         """Read objects into shell"""
@@ -222,7 +231,7 @@ class rshell(cmd.Cmd):
                 newobj = None
 
             # find and read objects
-            objs = self.rdir_helper.read(path, metainfo = True)
+            objs = self.rdir_helper.read(path, metainfo=True)
             if not objs:        # nothing found, try glob
                 pattern = path.rsplit('/', 1)
                 if len(pattern) > 1:
@@ -231,20 +240,20 @@ class rshell(cmd.Cmd):
                     path, pattern = None, pattern[0]
                 from fnmatch import fnmatchcase
                 match = lambda name: fnmatchcase(name, pattern)
-                _not_dir = lambda key: not is_dir(key) and match(key.GetName())
-                objs = self.rdir_helper.read(path, robj_p = _not_dir, metainfo = True)
+                notdir = lambda key: not is_dir(key) and match(key.GetName())
+                objs = self.rdir_helper.read(path, robj_p=notdir, metainfo=True)
             if not objs:        # nothing found, try regex
                 import re
                 match = re.compile(pattern).match
-                _not_dir = lambda key: not is_dir(key) and match(key.GetName())
-                objs = self.rdir_helper.read(path, robj_p = _not_dir, metainfo = True)
+                notdir = lambda key: not is_dir(key) and match(key.GetName())
+                objs = self.rdir_helper.read(path, robj_p=notdir, metainfo=True)
 
             # save read objects
             if newobj:
                 if len(objs) > 1:
-                    objs = {newobj : objs}
+                    objs = {newobj: objs}
                 else:
-                    objs = {newobj : objs[0]} # only one element
+                    objs = {newobj: objs[0]}  # only one element
             else:
                 objs = map(lambda obj: (obj.GetName(), obj), objs)
             self.save_obj(objs)
@@ -266,9 +275,11 @@ class rshell(cmd.Cmd):
 
     def do_python(self, args=None):
         """Start an interactive Python console"""
-        import code, readline, rlcompleter
+        import code
+        import readline
+        import rlcompleter
         myobjs = self.objs
-        ROOT_globals = dict([(k,v) for k, v in globals().iteritems()
+        ROOT_globals = dict([(k, v) for k, v in globals().iteritems()
                              if k.startswith('g') or k.startswith('k')])
         myobjs.update(ROOT_globals)
         # myobjs.update({'ls': self.do_ls, 'cd': self.do_cd, 'read' : self.do_read})
@@ -278,7 +289,7 @@ class rshell(cmd.Cmd):
         shell.interact()
 
     def help_pathspec(self):
-        msg  = "Paths inside the current file can be specified in the usual way:\n"
+        msg = "Paths inside the current file can be specified in the usual way:\n"
         msg += "- full path: /dir1/dir2\n"
         msg += "- relative path: ../dir1\n\n"
 
@@ -289,7 +300,8 @@ class rshell(cmd.Cmd):
         msg += "See: TDirectoryFile::cd(..) in ROOT docs and rdir.pathspec docs"
         print(msg)
 
-class rplotsh(rshell,empty):
+
+class rplotsh(rshell, empty):
     """Interactive plotting interface for ROOT files"""
 
     def do_EOF(self, line):
@@ -302,8 +314,12 @@ class rplotsh(rshell,empty):
 
 if __name__ == '__main__':
     # history file for interactive use
-    import atexit, readline, os, sys
+    import atexit
+    import readline
+    import os
+    import sys
     history_path = '.rplotsh'
+
     def save_history(history_path=history_path):
         import readline
         readline.write_history_file(history_path)

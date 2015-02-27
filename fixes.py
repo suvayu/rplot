@@ -19,7 +19,7 @@ before doing anything.
 import ROOT
 
 
-## General helpers
+# General helpers
 def set_attribute(clss, attr, value):
     """For all cls in clss, set cls.attr to value.
 
@@ -38,16 +38,15 @@ def set_attribute(clss, attr, value):
         _setter(clss, attr, value)
 
 
-## Ownership fixes
-# list of creators
+def set_ownership(methods):
+    """Tell Python, caller owns returned object by setting `clsmethod._creates'"""
+    set_attribute(methods, '_creates', True)
+
+
 _creators = [
     ROOT.TObject.Clone,
     ROOT.TFile.Open,
 ]
-
-def set_ownership(methods):
-    """Tell Python, caller owns returned object by setting `clsmethod._creates'"""
-    set_attribute(methods, '_creates', True)
 
 set_ownership(_creators)
 

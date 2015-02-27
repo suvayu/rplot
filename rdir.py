@@ -1,9 +1,10 @@
-#coding=utf-8
+# coding=utf-8
 """A global filesystem-like hierarchy of ROOT objects in PyROOT
 
 """
 
 import os.path
+
 
 class pathspec(object):
     """Path specification as expected by ROOT.
@@ -66,7 +67,7 @@ class pathspec(object):
         self.relative = self.rpath.find('../') == 0 or \
                         self.rpath.find('/') > 0
         if self.rfile and self.relative:
-            raise ValueError('Relative paths not allowed when a file is specified')
+            raise ValueError('Relative path not allowed with file specifier')
 
         # utilities
         self.rfile_dirname = os.path.dirname(self.rfile)
@@ -79,8 +80,10 @@ class pathspec(object):
     def __str__(self):
         return self.path
 
+
 from fixes import ROOT
 from ROOT import gROOT, gDirectory
+
 
 class savepwd(object):
     """Save present working directory and restore when done."""
@@ -97,6 +100,7 @@ class savepwd(object):
     def __del__(self):
         self.pwd.cd()
 
+
 class Rdir(object):
     """Global filesystem like directory hierarchy for a ROOT session."""
 
@@ -111,7 +115,7 @@ class Rdir(object):
                 else:
                     raise TypeError('Expected string, {} found'.format(type(f)))
 
-    def get_dir(self, path = None):
+    def get_dir(self, path=None):
         """Return directory from path.
 
         Doesn't check for non-directory.  It's the caller's
@@ -126,12 +130,12 @@ class Rdir(object):
                 if path.rfile:  # need to change to correct file first
                     if path.rfile not in [f.GetName() for f in self.files]:
                         # opening a file changes dir to the new file
-                        files += [ROOT.TFile.Open(path.rfile, 'read')]
+                        self.files += [ROOT.TFile.Open(path.rfile, 'read')]
                     else:
                         gROOT.cd('{}:'.format(path.rfile))
                 return gDirectory.GetDirectory(path.rpath)
 
-    def ls(self, path = None, robj_t = None, robj_p = None):
+    def ls(self, path=None, robj_t=None, robj_p=None):
         """Return list of key(s) in path.
 
         If path is a directory, returns a list of keys in the
@@ -167,7 +171,7 @@ class Rdir(object):
             keys = filter(robj_p, keys)
         return filter(None, keys)
 
-    def ls_names(self, path = None, robj_t = None, robj_p = None):
+    def ls_names(self, path=None, robj_t=None, robj_p=None):
         """Return list of key(s) names in path.
 
         For documentation on arguments, see Rdir.ls(..)
@@ -175,7 +179,7 @@ class Rdir(object):
         """
         return [k.GetName() for k in self.ls(path, robj_t, robj_p)]
 
-    def read(self, path = None, robj_t = None, robj_p = None, metainfo = False):
+    def read(self, path=None, robj_t=None, robj_p=None, metainfo=False):
         """Return list of object(s) in path.
 
         When metainfo is True, source filename is added as a property

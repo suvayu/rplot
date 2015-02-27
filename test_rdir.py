@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 import unittest
-
 from rdir import pathspec
+
+
 class test_pathspec(unittest.TestCase):
     def setUp(self):
         self.full_path = pathspec('foo.root:/bar/baz')
@@ -36,8 +37,9 @@ class test_pathspec(unittest.TestCase):
 import os
 from fixes import ROOT
 from ROOT import gDirectory, TFile
-
 from rdir import savepwd
+
+
 class test_savepwd(unittest.TestCase):
     def setUp(self):
         self.rfile = TFile.Open('/tmp/test_savepwd.root', 'recreate')
@@ -67,6 +69,8 @@ class test_savepwd(unittest.TestCase):
 
 
 from rdir import Rdir
+
+
 class test_Rdir(unittest.TestCase):
     def setUp(self):
         """Make ROOT files with some contents.
@@ -142,13 +146,15 @@ class test_Rdir(unittest.TestCase):
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:/dirb')
         keys_r = rdir_helper.files[0].GetDirectory('/dirb').GetListOfKeys()
         res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        self.assertTrue(reduce(lambda i, j: i and j, res),
+                        msg='Keys do not match')
 
         # FIXME: change files to see if any effects show up, need better test
         keys_t = rdir_helper.ls('/tmp/test_Rdir1.root')
         keys_r = rdir_helper.files[1].GetListOfKeys()
         res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        self.assertTrue(reduce(lambda i, j: i and j, res),
+                        msg='Keys do not match')
 
     def test_ls_rel(self):
         rdir_helper = Rdir(self.fnames)
@@ -157,12 +163,14 @@ class test_Rdir(unittest.TestCase):
             keys_t = rdir_helper.ls('../../')
             keys_r = rdir.GetDirectory('../../').GetListOfKeys()
             res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-            self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+            self.assertTrue(reduce(lambda i, j: i and j, res),
+                            msg='Keys do not match')
 
             keys_t = rdir_helper.ls('../../../')
             keys_r = rdir.GetDirectory('../../../').GetListOfKeys()
             res = map(lambda i, j: i.GetName() == j.GetName(), keys_t, keys_r)
-            self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+            self.assertTrue(reduce(lambda i, j: i and j, res),
+                            msg='Keys do not match')
         else:
             self.fail(msg='Prep for Rdir.ls() with relative path failed')
 
@@ -184,23 +192,24 @@ class test_Rdir(unittest.TestCase):
         objs_r = [k.ReadObj() for k in rdir_helper.files[1].GetListOfKeys()]
         # self.assertItemsEqual(objs_r, objs_t) # doesn't work'
         res = map(lambda i, j: i.GetName() == j.GetName(), objs_t, objs_r)
-        self.assertTrue(reduce(lambda i, j: i and j, res), msg='Keys do not match')
+        self.assertTrue(reduce(lambda i, j: i and j, res),
+                        msg='Keys do not match')
 
-        objs_t = rdir_helper.read('/tmp/test_Rdir1.root', metainfo = True)
+        objs_t = rdir_helper.read('/tmp/test_Rdir1.root', metainfo=True)
         res = map(lambda o: o.file == '/tmp/test_Rdir1.root', objs_t)
         self.assertTrue(reduce(lambda i, j: i and j, res))
 
     def test_filter(self):
         rdir_helper = Rdir(self.fnames)
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
-                                robj_t = ROOT.TDirectoryFile)
+                                robj_t=ROOT.TDirectoryFile)
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
                   if ROOT.TClass.GetClass(k.GetClassName()) \
                   .InheritsFrom(ROOT.TDirectoryFile.Class())]
         self.assertItemsEqual(keys_r, keys_t)
 
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
-                                robj_p = lambda k: k.GetName().find('hist') >= 0)
+                                robj_p=lambda k: k.GetName().find('hist') >= 0)
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
                   if k.GetName().find('hist') >= 0]
         self.assertItemsEqual(keys_r, keys_t)

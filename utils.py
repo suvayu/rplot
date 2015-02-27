@@ -1,7 +1,8 @@
 # coding=utf-8
 """Utilities"""
 
-def _import_args(namespace, d = {}):
+
+def _import_args(namespace, d={}):
     """Import attributes from namespace to local environment.
 
     namespace -- namespace to import attributes from
@@ -19,6 +20,7 @@ def _import_args(namespace, d = {}):
         d[attr] = getattr(namespace, attr)
     return d
 
+
 def is_dir(key):
     """Is it a directory key?"""
     from ROOT import TClass, TDirectoryFile
@@ -26,7 +28,7 @@ def is_dir(key):
                  .InheritsFrom(TDirectoryFile.Class())
 
 
-## histogram utilities
+# histogram utilities
 def th1fill(hist, dim=1):
     """Return a TH1.Fill wrapper for use with map(..)."""
     if 1 == dim:
@@ -39,12 +41,14 @@ def th1fill(hist, dim=1):
         fill = None
     return fill
 
+
 def th1clonereset(hist, name):
     """Clone and reset ROOT histogram"""
     res = hist.Clone(name)
     res.Reset('icesm')
     res.Sumw2()
     return res
+
 
 def thnbincontent(hist, x, y=0, z=0, err=False, asym=False):
     """Get histogram bin content.
@@ -72,6 +76,7 @@ def thnbincontent(hist, x, y=0, z=0, err=False, asym=False):
     else:
         return content
 
+
 def taxisbincentre(axis, i, edges=False, width=False):
     """Get histogram bin centre (X-axis).
 
@@ -89,6 +94,7 @@ def taxisbincentre(axis, i, edges=False, width=False):
         return (axis.GetBinCenter(i), axis.GetBinWidth(i))
     else:
         return axis.GetBinCenter(i)
+
 
 def thnbincentre(hist, i, edges=False, width=False):
     """Get histogram bin centre (X, Y, Z).
@@ -113,7 +119,8 @@ def thnbincentre(hist, i, edges=False, width=False):
 try:
     import numpy as np
 
-    def thn2array(hist, err=False, asym=False, pair=False, shaped=False, overflow=False):
+    def thn2array(hist, err=False, asym=False, pair=False, shaped=False,
+                  overflow=False):
         """Convert ROOT histograms to numpy.array
 
            hist -- histogram to convert
@@ -131,33 +138,36 @@ try:
             zbins = hist.GetNbinsZ()
             # add overflow, underflow bins
             overflow *= 2
-            if ybins == 1: shape = [xbins + overflow]
-            elif zbins == 1: shape = [xbins + overflow, ybins + overflow]
-            else: shape = [xbins + overflow, ybins + overflow, zbins + overflow]
+            if ybins == 1:
+                shape = [xbins + overflow]
+            elif zbins == 1:
+                shape = [xbins + overflow, ybins + overflow]
+            else:
+                shape = [xbins + overflow, ybins + overflow, zbins + overflow]
         else:
             shape = [len(hist)]
-            if not overflow: shape[0] -= 2
-        if err: shape.append(3 if asym else 2)
-        hiter = xrange(len(hist)) if overflow else xrange(1,len(hist)-1)
+            if not overflow:
+                shape[0] -= 2
+        if err:
+            shape.append(3 if asym else 2)
+        hiter = xrange(len(hist)) if overflow else xrange(1, len(hist)-1)
         val = np.array([thnbincontent(hist, i, err=err, asym=asym)
                         for i in hiter]).reshape(*shape)
-        if pair: return val
-        else: return val.transpose()
+        return val if pair else val.transpose()
 
     def thnbins(hist, edges=False, width=False, pair=False, overflow=False):
         """Return histogram bin centre or edges"""
-        hiter = xrange(len(hist)) if overflow else xrange(1,len(hist)-1)
+        hiter = xrange(len(hist)) if overflow else xrange(1, len(hist)-1)
         val = np.array([thnbincentre(hist, i, edges=edges, width=width)
                         for i in hiter])
-        if pair: return val
-        else: return val.transpose()
+        return val if pair else val.transpose()
 
     def thnprint(hist, err=False, asym=False, pair=False, shaped=True):
         """Print ROOT histograms of any dimention"""
         val = thn2array(hist, err=err, asym=asym, pair=pair, shaped=shaped)
         print('Hist: {}, dim: {}'.format(hist.GetName(), len(np.shape(val))))
         hist.Print()
-        print(np.flipud(val)) # flip y axis, FIXME: check what happens for 3D
+        print(np.flipud(val))  # flip y axis, FIXME: check what happens for 3D
 
 except ImportError:
     import warnings
@@ -175,11 +185,13 @@ except ImportError:
     def thnprint(hist, err, asym, pair, shaped):
         raise NotImplementedError('Not available without numpy')
 
+
 def th1offset(hist, offset):
     """Offset non-empty histogram bins"""
     # only offset bins with content
     for b in xrange(hist.GetXaxis().GetNbins()):
         content = hist.GetBinContent(b)
         # FIXME: shouldn't work, comparing floats
-        if content != 0.: hist.SetBinContent(b, content+offset)
+        if content != 0.:
+            hist.SetBinContent(b, content+offset)
     return hist
