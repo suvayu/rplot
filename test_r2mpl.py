@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 from fixes import ROOT
 from r2mpl import th12errorbar, th12hist

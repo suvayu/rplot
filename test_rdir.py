@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import unittest
 import os
 from fixes import ROOT
