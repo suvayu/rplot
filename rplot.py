@@ -72,8 +72,8 @@ def arrange(plottables, sep, reverse=False, predicate=None):
         if reverse:
             l.reverse()
         tmp.append(l)
-    if predicate:
-        map(predicate, l)
+        if predicate:
+            map(predicate, l)
     return tmp
 
 
