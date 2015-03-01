@@ -21,6 +21,14 @@ def _import_args(namespace, d={}):
     return d
 
 
+def file_hash(filename):
+    """Calculate MD5 hash of file based on contents"""
+    import hashlib
+    with open(filename) as myfile:
+        contents = myfile.read()
+        return hashlib.md5(contents).hexdigest()
+
+
 def is_type(key, rtype):
     """Is key the ROOT type `rtype''?"""
     from ROOT import TClass

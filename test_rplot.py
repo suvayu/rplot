@@ -2,10 +2,10 @@
 
 import unittest
 import os
-import hashlib
 from fixes import ROOT
 from ROOT import TH1F, TF1
 from rplot import arrange, Rplot
+from utils import file_hash
 from string import ascii_lowercase
 
 __pngfile__ = '/tmp/test.png'
@@ -28,13 +28,6 @@ def fill_hists(hists, fns):
         hist.FillRandom(fns[i].GetName(), 1000)
         hist.SetXTitle('Foo[bar]')
         hist.SetYTitle('Events')
-
-
-def file_hash(filename=__pngfile__):
-    """Calculate MD5 hash of file contents"""
-    with open(filename) as png:
-        contents = png.read()
-        return hashlib.md5(contents).hexdigest()
 
 
 class test_arrange(unittest.TestCase):
@@ -95,7 +88,8 @@ class test_Rplot(unittest.TestCase):
         plotter.draw_hist(self.plots, 'hist')
         plotter.canvas.Update()
         plotter.canvas.Print(__pngfile__)
-        self.assertEqual('25c6ff7ed5422880e47a0c50b0d6e044', file_hash())
+        self.assertEqual('25c6ff7ed5422880e47a0c50b0d6e044',
+                         file_hash(__pngfile__))
 
     def test_stack(self):
         # splicing overwrites ROOT objects in memory
@@ -105,4 +99,5 @@ class test_Rplot(unittest.TestCase):
         plotter.draw_hist(plots, 'hist')
         plotter.canvas.Update()
         plotter.canvas.Print(__pngfile__)
-        self.assertEqual('df05887dc179fc0097d0f01dfd9f23a8', file_hash())
+        self.assertEqual('df05887dc179fc0097d0f01dfd9f23a8',
+                         file_hash(__pngfile__))
