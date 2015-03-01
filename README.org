@@ -7,30 +7,33 @@ objects.
 - ~rdir~ :: interface to browse multiple ROOT files.
 - ~rplot~ :: interface to plot ROOT objects.
 - ~rplotsh~ :: script to interactively browse multiple ROOT files,
-                  read objects, and plot them.
-- ~root2matplotlib~ :: ROOT to matplotlib translation layer (copied
-     from the rootpy project).
+     read objects, and plot them.
+- ~r2mpl~ :: ROOT to matplotlib translation layer.
 
 
 * Tasks
 ** rplotsh [0/3]
+*** TODO Plotting
+: plot <object> | <list>
 *** TODO Plot settings
 : set grid ...
 : set linestyle | linecolour | linewidth ...
 : set stack
 : set legends ...
-*** TODO Plotting
-: plot <object> | <list>
-*** TODO List objects in memory
-: ls memory
-: mv <memobj> <tolist> 
+*** WInP Manipulate objects in memory [1/2]
+- [X] list objects
+  : lsmem [memobj]...
+- [ ] move objects to container
+  : mv <memobj>... <container>
 
 ** Rplot [1/4]
-*** DONE Stack
-    CLOSED: [2014-09-16 Tue 16:22]
 *** TODO Line style, width
 *** TODO Marker style, size
 *** TODO Automatic legends w/ smart placement
+*** DONE Stack
+    CLOSED: [2014-09-16 Tue 16:22]
 
-** root2matplotlib [0/1]
-*** TODO Translate ~get_limits~ from rootpy
+** r2mpl [0/1]
+*** TODO Translate ROOT histogram to numpy array
+Histograms in ~mpl~ still retain the dataset granularity, whereas it
+is lost in ROOT.  Need to fake this behaviour during conversion.
