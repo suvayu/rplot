@@ -1,9 +1,13 @@
 PYTHON	:= $(shell which python)
 
 TESTS	:= $(wildcard test_*.py)
+TESTS	:= $(TESTS:%.py=%)
 
 # targets
-$(TESTS:%.py=%):%:	%.py
-	 $(PYTHON) -m unittest $(OPTS) $@
+.PHONY:	discover $(TESTS)
 
--include local.mk
+discover:
+	$(PYTHON) -m unittest discover $(OPTS)
+
+$(TESTS):%:	%.py
+	$(PYTHON) -m unittest $(OPTS) $@
