@@ -3,7 +3,6 @@
 
 # argument parsing
 from argparse import ArgumentParser
-from utils import (_import_args)
 
 optparser = ArgumentParser(description=__doc__)
 optparser.add_argument('filenames', nargs='+', help='ROOT files')
@@ -290,6 +289,9 @@ class rshell(cmd.Cmd):
         print('in a list of that name.  <objname> can also be a')
         print('globbing pattern or a regular expression, `as ')
         print('<newobjname>\' semantics are similar to directory.')
+        print
+        print('Note: Since `as\' is a keyword, an object named as cannot')
+        print('be read simply.  Use a regex for that: e.g. a[s].')
 
     def do_python(self, args=None):
         """Start an interactive Python console"""
@@ -307,15 +309,16 @@ class rshell(cmd.Cmd):
         shell.interact()
 
     def help_pathspec(self):
-        msg = "Paths inside the current file can be specified in the usual way:\n"
+        msg = "Paths inside the current file can be specified using the\n"
+        msg += "normal syntax:\n"
         msg += "- full path: /dir1/dir2\n"
         msg += "- relative path: ../dir1\n\n"
 
-        msg += "Paths in other root files have to be preceded by the file name\n"
-        msg += "and a colon:\n"
+        msg += "Paths in other root files have to be preceded by the file\n"
+        msg += "name and a colon:\n"
         msg += "- file path: myfile.root:/dir1/dir2\n\n"
 
-        msg += "See: TDirectoryFile::cd(..) in ROOT docs and rdir.pathspec docs"
+        msg += "See: TDirectoryFile::cd(..) in ROOT and rdir.pathspec docs"
         print(msg)
 
 
@@ -348,13 +351,10 @@ if __name__ == '__main__':
     atexit.register(save_history)
     del atexit, readline, save_history, history_path
 
-    # import CLI options to local namespace
-    locals().update(_import_args(options))
-
     # command loop
     try:
         rplotsh_inst = rplotsh()
-        rplotsh_inst.add_files(filenames)
+        rplotsh_inst.add_files(options.filenames)
         rplotsh_inst.cmdloop()
     except KeyboardInterrupt:
         rplotsh_inst.postloop()
