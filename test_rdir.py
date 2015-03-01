@@ -1,7 +1,10 @@
 #!/usr/bin/env python
 
 import unittest
-from rdir import pathspec
+import os
+from fixes import ROOT
+from ROOT import gDirectory, TFile
+from rdir import pathspec, savepwd, Rdir
 
 
 class test_pathspec(unittest.TestCase):
@@ -34,12 +37,6 @@ class test_pathspec(unittest.TestCase):
         self.assertRaises(ValueError, pathspec, 'foo.root:../bar/baz')
 
 
-import os
-from fixes import ROOT
-from ROOT import gDirectory, TFile
-from rdir import savepwd
-
-
 class test_savepwd(unittest.TestCase):
     def setUp(self):
         self.rfile = TFile.Open('/tmp/test_savepwd.root', 'recreate')
@@ -66,9 +63,6 @@ class test_savepwd(unittest.TestCase):
         except KeyboardInterrupt:
             pass
         self.assertEqual(oldpwd, gDirectory.GetName())
-
-
-from rdir import Rdir
 
 
 class test_Rdir(unittest.TestCase):
