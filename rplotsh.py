@@ -307,12 +307,21 @@ class rshell(cmd.Cmd):
                           kOpenTriangleUp, kOpenTriangleDown)
         ROOT_globals = dict([(k, v) for k, v in locals().iteritems()
                              if k.startswith('g') or k.startswith('k')])
+
         myobjs.update(ROOT_globals)
-        # myobjs.update({'ls': self.do_ls, 'cd': self.do_cd, 'read' : self.do_read})
+
+        # save, switch, and restore history files
+        readline.write_history_file(__histfile__)
+        readline.clear_history()  # remove rplotsh history from Python
+        if os.path.exists(__pyhistfile__):
+            readline.read_history_file(__pyhistfile__)
         readline.set_completer(rlcompleter.Completer(myobjs).complete)
         readline.parse_and_bind("tab: complete")
         shell = code.InteractiveConsole(myobjs)
         shell.interact()
+        readline.write_history_file(__pyhistfile__)
+        if os.path.exists(__histfile__):
+            readline.read_history_file(__histfile__)
 
     def help_pathspec(self):
         msg = "Paths inside the current file can be specified using the\n"
@@ -345,17 +354,16 @@ if __name__ == '__main__':
     import readline
     import os
     import sys
-    history_path = '.rplotsh'
 
-    def save_history(history_path=history_path):
-        import readline
-        readline.write_history_file(history_path)
+    # history variables
+    __histfile__ = '.rplotsh'
+    __pyhistfile__ = '{}.py'.format(__histfile__)
 
-    if os.path.exists(history_path):
-        readline.read_history_file(history_path)
+    if os.path.exists(__histfile__):
+        readline.read_history_file(__histfile__)
 
-    atexit.register(save_history)
-    del atexit, readline, save_history, history_path
+    atexit.register(readline.write_history_file, __histfile__)
+    del atexit, readline
 
     # command loop
     try:
