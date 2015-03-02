@@ -315,10 +315,15 @@ class rshell(cmd.Cmd):
         readline.clear_history()  # remove rplotsh history from Python
         if os.path.exists(__pyhistfile__):
             readline.read_history_file(__pyhistfile__)
+
+        # save and restore old completer
+        rplotsh_completer = readline.get_completer()
         readline.set_completer(rlcompleter.Completer(myobjs).complete)
         readline.parse_and_bind("tab: complete")
         shell = code.InteractiveConsole(myobjs)
         shell.interact()
+        readline.set_completer(rplotsh_completer)
+
         readline.write_history_file(__pyhistfile__)
         if os.path.exists(__histfile__):
             readline.read_history_file(__histfile__)
