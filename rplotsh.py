@@ -298,7 +298,11 @@ class rshell(cmd.Cmd):
         import code
         import readline
         import rlcompleter
-        myobjs = self.objs
+
+        # objects read into memory
+        from copy import deepcopy
+        myobjs = deepcopy(self.objs)
+
         ROOT_globals = dict([(k, v) for k, v in globals().iteritems()
                              if k.startswith('g') or k.startswith('k')])
         myobjs.update(ROOT_globals)
