@@ -10,17 +10,7 @@ options = optparser.parse_args()
 
 
 from fixes import ROOT
-from ROOT import gROOT, gSystem, gDirectory, gPad, gStyle
-# colours
-from ROOT import (kBlack, kWhite, kGray, kViolet, kMagenta, kPink,
-                  kRed, kOrange, kYellow, kSpring, kGreen, kTeal,
-                  kCyan, kAzure, kBlue)
-# markers
-from ROOT import (kDot, kPlus, kStar, kCircle, kMultiply,
-                  kFullDotSmall, kFullDotMedium, kFullDotLarge,
-                  kFullCircle, kFullSquare, kFullTriangleUp,
-                  kFullTriangleDown, kOpenCircle, kOpenSquare,
-                  kOpenTriangleUp, kOpenTriangleDown)
+from ROOT import gROOT, gDirectory
 
 import cmd
 from rdir import Rdir
@@ -303,7 +293,19 @@ class rshell(cmd.Cmd):
         from copy import deepcopy
         myobjs = deepcopy(self.objs)
 
-        ROOT_globals = dict([(k, v) for k, v in globals().iteritems()
+        # useful ROOT globals
+        from ROOT import gROOT, gDirectory, gSystem, gPad, gStyle
+        # colours
+        from ROOT import (kBlack, kWhite, kGray, kViolet, kMagenta, kPink,
+                          kRed, kOrange, kYellow, kSpring, kGreen, kTeal,
+                          kCyan, kAzure, kBlue)
+        # markers
+        from ROOT import (kDot, kPlus, kStar, kCircle, kMultiply,
+                          kFullDotSmall, kFullDotMedium, kFullDotLarge,
+                          kFullCircle, kFullSquare, kFullTriangleUp,
+                          kFullTriangleDown, kOpenCircle, kOpenSquare,
+                          kOpenTriangleUp, kOpenTriangleDown)
+        ROOT_globals = dict([(k, v) for k, v in locals().iteritems()
                              if k.startswith('g') or k.startswith('k')])
         myobjs.update(ROOT_globals)
         # myobjs.update({'ls': self.do_ls, 'cd': self.do_cd, 'read' : self.do_read})
