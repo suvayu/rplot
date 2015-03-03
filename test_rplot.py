@@ -91,7 +91,7 @@ class test_Rplot(unittest.TestCase):
 
     def test_stack(self):
         # splicing overwrites ROOT objects in memory
-        plots = [self.plots[2], self.plots[3]]
+        plots = self.plots[2:]
         plotter = Rplot(2, 1, 1200, 400)
         plotter.stack = True
         plotter.draw_hist(plots, 'hist')
