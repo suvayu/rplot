@@ -21,6 +21,10 @@ class empty(cmd.Cmd):
     def emptyline(self):
         pass
 
+    def do_EOF(self, line):
+        """Exit on EOF (C-d)"""
+        return True
+
 
 class rshell(cmd.Cmd):
     """Shell-like navigation commands for ROOT files"""
@@ -353,9 +357,6 @@ class rshell(cmd.Cmd):
 class rplotsh(rshell, empty):
     """Interactive plotting interface for ROOT files"""
 
-    def do_EOF(self, line):
-        """Exit rplot shell"""
-        return True
 
     def postloop(self):
         print
