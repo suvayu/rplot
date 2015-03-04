@@ -2,6 +2,20 @@
 """Utilities"""
 
 
+from argparse import (ArgumentParser, ArgumentDefaultsHelpFormatter,
+                      RawDescriptionHelpFormatter)
+
+
+class NoExitArgParse(ArgumentParser):
+    def error(self, message):
+        raise RuntimeError(message)
+
+
+class RawArgDefaultFormatter(ArgumentDefaultsHelpFormatter,
+                             RawDescriptionHelpFormatter):
+    pass
+
+
 def _import_args(namespace, d={}):
     """Import attributes from namespace to local environment.
 
