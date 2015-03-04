@@ -8,13 +8,13 @@ optparser = ArgumentParser(description=__doc__)
 optparser.add_argument('filenames', nargs='+', help='ROOT files')
 options = optparser.parse_args()
 
-
 from fixes import ROOT
 from ROOT import gROOT, gDirectory
 
 import cmd
 from rdir import Rdir
-from utils import is_dir
+from utils import is_dir, NoExitArgParse
+from textwrap import dedent
 
 
 class empty(cmd.Cmd):
@@ -25,9 +25,12 @@ class empty(cmd.Cmd):
 class rshell(cmd.Cmd):
     """Shell-like navigation commands for ROOT files"""
 
-    ls_parser = ArgumentParser()
-    ls_parser.add_argument('-l', action='store_true', dest='showtype')
-    ls_parser.add_argument('paths', nargs='*')
+    ls_parser = NoExitArgParse(description='List objects in directory/file',
+                               epilog='See also: pathspec', add_help=False)
+    ls_parser.add_argument('-l', action='store_true', dest='showtype',
+                           help='Long form listing, include object type and '
+                           'size (compressed in parantheses).')
+    ls_parser.add_argument('paths', nargs='*', help='Object names.')
 
     pwd = gROOT
     prompt = '{}> '.format(pwd.GetName())
@@ -127,7 +130,7 @@ class rshell(cmd.Cmd):
             raise ValueError('{}: cannot access {}: No such object')
 
     def do_lsmem(self, args):
-        """List objects read into memory"""
+        """List objects read in memory"""
         def print_objs(objs):
             for name, obj in objs.iteritems():
                 print '{:<30}  <-  {:<}'.format(name, obj)
@@ -144,8 +147,11 @@ class rshell(cmd.Cmd):
     def complete_lsmem(self, text, line, begidx, endidx):
         return filter(lambda key: key.startswith(text), self.objs)
 
+    def help_ls(self):
+        self.ls_parser.print_help()
+
     def do_ls(self, args=''):
-        """List contents of a directory/file. (see `pathspec')"""
+        """List contents of a directory/file"""
         opts = self.ls_parser.parse_args(args.split())
         if opts.paths:          # w/ args
             for path in opts.paths:
@@ -175,13 +181,14 @@ class rshell(cmd.Cmd):
                     self.ls_objs(self.rdir_helper.ls(), opts.showtype)
                 except ValueError as err:
                     print(str(err).format('ls', ''))
-                    print('Warning: this shouldn\'t happen, something went terribly wrong!')
+                    print('Warning: this shouldn\'t happen, something went '
+                          'terribly wrong!')
 
     def complete_ls(self, text, line, begidx, endidx):
         return self.completion_helper(text, line, begidx, endidx)
 
     def do_pwd(self, args=None):
-        """Print the name of current working directory"""
+        """Print the name of the current working directory"""
         thisdir = self.pwd.GetDirectory('')
         pwdname = thisdir.GetName()
         while not (isinstance(thisdir, ROOT.TFile) or self.pwd == gROOT):
@@ -197,7 +204,7 @@ class rshell(cmd.Cmd):
             print('{}:/{}'.format(thisdir.GetName(), pwdname))
 
     def do_cd(self, args=''):
-        """Change directory to specified directory. (see `pathspec')"""
+        """Change directory to specified directory.  See also: pathspec."""
         if args.strip() == '-':
             success = self.oldpwd.cd()
         else:
@@ -215,6 +222,20 @@ class rshell(cmd.Cmd):
     def save_obj(self, args):
         """Read objects into shell"""
         self.objs.update(args)
+
+    def help_read(self):
+        msg = '''\
+        Syntax: read <objname> [as <newobjname>]
+
+        If <objname> is a directory, all objects in that directory are
+        read in to memory.  In this case, if `as <newobjname>\' is present,
+        objects are stored in a list of that name.  <objname> can also be a
+        globbing pattern or a regular expression, `as <newobjname>\'
+        semantics are similar to directory.
+
+        Note: Since `as\' is a keyword, an object named `as\' cannot be read
+        simply.  Use a regex for that: e.g. a[s].'''
+        print(dedent(msg))
 
     def do_read(self, args):
         """Read objects into memory."""
@@ -270,19 +291,6 @@ class rshell(cmd.Cmd):
     def complete_read(self, text, line, begidx, endidx):
         return self.completion_helper(text, line, begidx, endidx)
 
-    def help_read(self):
-        print('Syntax: read <objname> [as <newobjname>]')
-        print
-        print('If <objname> is a directory, all objects in that')
-        print('directory are read in to memory.  In this case,')
-        print('if `as <newobjname>\' is present, objects are stored')
-        print('in a list of that name.  <objname> can also be a')
-        print('globbing pattern or a regular expression, `as ')
-        print('<newobjname>\' semantics are similar to directory.')
-        print
-        print('Note: Since `as\' is a keyword, an object named as cannot')
-        print('be read simply.  Use a regex for that: e.g. a[s].')
-
     def do_python(self, args=None):
         """Start an interactive Python console"""
         import code
@@ -329,17 +337,17 @@ class rshell(cmd.Cmd):
             readline.read_history_file(__histfile__)
 
     def help_pathspec(self):
-        msg = "Paths inside the current file can be specified using the\n"
-        msg += "normal syntax:\n"
-        msg += "- full path: /dir1/dir2\n"
-        msg += "- relative path: ../dir1\n\n"
+        msg = '''\
+        Paths inside the current file can be specified using the normal syntax:
+        - full path: /dir1/dir2
+        - relative path: ../dir1
 
-        msg += "Paths in other root files have to be preceded by the file\n"
-        msg += "name and a colon:\n"
-        msg += "- file path: myfile.root:/dir1/dir2\n\n"
+        Paths in other root files have to be preceded by the file name and a
+        colon:
+        - file path: myfile.root:/dir1/dir2
 
-        msg += "See: TDirectoryFile::cd(..) in ROOT and rdir.pathspec docs"
-        print(msg)
+        See also: TDirectoryFile::cd(..) in ROOT docs, `help pathspec\'.'''
+        print(dedent(msg))
 
 
 class rplotsh(rshell, empty):
