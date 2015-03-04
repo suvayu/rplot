@@ -11,6 +11,19 @@ objects.
 - ~r2mpl~ :: ROOT to matplotlib translation layer.
 
 
+* Installation
+At the moment there are no install scripts.  So all you need to do
+is add a symlink to the python script rplotsh.py somewhere in your
+path.  This is what I do:
+
+#+begin_example
+  $ export PATH=~/bin:$PATH
+  $ ln -s ~/bin/rplotsh /path/to/repo/rplotsh.py
+#+end_example
+
+After the above steps, rplotsh should work from anywhere.
+
+
 * Tasks
 ** rplotsh [0/3]
 *** TODO Plotting
