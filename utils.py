@@ -2,47 +2,6 @@
 """Utilities"""
 
 
-from argparse import (ArgumentParser, ArgumentDefaultsHelpFormatter,
-                      RawDescriptionHelpFormatter)
-
-
-class NoExitArgParse(ArgumentParser):
-    def error(self, message):
-        raise RuntimeError(message)
-
-
-class RawArgDefaultFormatter(ArgumentDefaultsHelpFormatter,
-                             RawDescriptionHelpFormatter):
-    pass
-
-
-def _import_args(namespace, d={}):
-    """Import attributes from namespace to local environment.
-
-    namespace -- namespace to import attributes from
-    d         -- dictionary that is returned with attributes
-                 and values (default: empty dict, leave it
-                 this way unless you know what you are doing)
-
-    Usage:
-      >>> opts = parser.parse_args(['foo', '-o', 'bar'])
-      >>> locals().update(_import_args(opts))
-
-    """
-    attrs = vars(namespace)
-    for attr in attrs:
-        d[attr] = getattr(namespace, attr)
-    return d
-
-
-def file_hash(filename):
-    """Calculate MD5 hash of file based on contents"""
-    import hashlib
-    with open(filename) as myfile:
-        contents = myfile.read()
-        return hashlib.md5(contents).hexdigest()
-
-
 def is_type(key, rtype):
     """Is key the ROOT type `rtype''?"""
     from ROOT import TClass
@@ -222,3 +181,45 @@ def th1offset(hist, offset):
         if content != 0.:
             hist.SetBinContent(b, content+offset)
     return hist
+
+
+# other utilities
+from argparse import (ArgumentParser, ArgumentDefaultsHelpFormatter,
+                      RawDescriptionHelpFormatter)
+
+
+class NoExitArgParse(ArgumentParser):
+    def error(self, message):
+        raise RuntimeError(message)
+
+
+class RawArgDefaultFormatter(ArgumentDefaultsHelpFormatter,
+                             RawDescriptionHelpFormatter):
+    pass
+
+
+def _import_args(namespace, d={}):
+    """Import attributes from namespace to local environment.
+
+    namespace -- namespace to import attributes from
+    d         -- dictionary that is returned with attributes
+                 and values (default: empty dict, leave it
+                 this way unless you know what you are doing)
+
+    Usage:
+      >>> opts = parser.parse_args(['foo', '-o', 'bar'])
+      >>> locals().update(_import_args(opts))
+
+    """
+    attrs = vars(namespace)
+    for attr in attrs:
+        d[attr] = getattr(namespace, attr)
+    return d
+
+
+def file_hash(filename):
+    """Calculate MD5 hash of file based on contents"""
+    import hashlib
+    with open(filename) as myfile:
+        contents = myfile.read()
+        return hashlib.md5(contents).hexdigest()
