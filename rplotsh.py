@@ -111,14 +111,12 @@ class rshell(cmd.Cmd):
             cname = key.ClassName()
         cls = ROOT.TClass.GetClass(cname)
         if cls.InheritsFrom(ROOT.TFile.Class()):
-            print(fmt.format(cls=cname, nm=name, m=':',
-                             fs='-', us='-'))
+            res = fmt.format(cls=cname, nm=name, m=':', fs='-', us='-')
         elif cls.InheritsFrom(ROOT.TDirectoryFile.Class()):
-            print(fmt.format(cls=cname, nm=name, m='/',
-                             fs=fsize, us=usize))
+            res = fmt.format(cls=cname, nm=name, m='/', fs=fsize, us=usize)
         else:
-            print(fmt.format(cls=cname, nm=name, m='',
-                             fs=fsize, us=usize))
+            res = fmt.format(cls=cname, nm=name, m='', fs=fsize, us=usize)
+        print(res)
 
     def ls_objs(self, keys, showtype=False, indent=''):
         # handle invalid keys
