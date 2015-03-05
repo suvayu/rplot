@@ -131,20 +131,27 @@ class rshell(cmd.Cmd):
         else:
             raise ValueError('{}: cannot access {}: No such object')
 
+    def print_memobjs(self, objs):
+        """Print memory objects"""
+        for name, obj in objs.iteritems():
+            print '{}:\n  {}'.format(name, root_str(obj))
+
     def do_lsmem(self, args):
         """List objects read in memory"""
-        def print_objs(objs):
-            for name, obj in objs.iteritems():
-                print '{}:\n  {}'.format(name, root_str(obj))
         if args:
             import shlex
             tokens = shlex.split(args)
-            tmp = dict([(tok, self.objs[tok]) for tok in tokens])
-            if not tmp:
+            try:
                 tmp = dict([(tok, self.objs[tok]) for tok in tokens])
-            print_objs(tmp)
+            except KeyError:
+                from fnmatch import fnmatchcase
+                tmp = {}
+                for tok in tokens:
+                    tmp.update(dict([(key, self.objs[key]) for key in self.objs
+                                     if fnmatchcase(key, tok)]))
+            self.print_memobjs(tmp)
         else:
-            print_objs(self.objs)
+            self.print_memobjs(self.objs)
 
     def complete_lsmem(self, text, line, begidx, endidx):
         return filter(lambda key: key.startswith(text), self.objs)
