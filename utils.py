@@ -14,6 +14,18 @@ def is_dir(key):
     return is_type(key, TDirectoryFile)
 
 
+def root_str(objs):
+    """String representation for ROOT objects"""
+    fmt = '{cls}({nm})'
+    try:
+        res = [fmt.format(cls=obj.ClassName(), nm=obj.GetName())
+               for obj in objs]
+        res = '[{}]'.format(', '.join(res))
+    except:
+        res = fmt.format(cls=objs.ClassName(), nm=objs.GetName())
+    return res
+
+
 # histogram utilities
 def th1fill(hist, dim=1):
     """Return a TH1.Fill wrapper for use with map(..)."""

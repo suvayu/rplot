@@ -13,7 +13,7 @@ from ROOT import gROOT, gDirectory
 
 import cmd
 from rdir import Rdir
-from utils import is_dir, NoExitArgParse
+from utils import is_dir, root_str, NoExitArgParse
 from textwrap import dedent
 
 
@@ -135,7 +135,7 @@ class rshell(cmd.Cmd):
         """List objects read in memory"""
         def print_objs(objs):
             for name, obj in objs.iteritems():
-                print '{:<30}  <-  {:<}'.format(name, obj)
+                print '{}:\n  {}'.format(name, root_str(obj))
         if args:
             import shlex
             tokens = shlex.split(args)
