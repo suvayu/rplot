@@ -12,6 +12,7 @@ from fixes import ROOT
 from ROOT import gROOT, gDirectory
 
 import cmd
+import shlex
 from rdir import Rdir
 from utils import is_dir, root_str, NoExitArgParse
 from textwrap import dedent
@@ -139,7 +140,6 @@ class rshell(cmd.Cmd):
     def do_lsmem(self, args):
         """List objects read in memory"""
         if args:
-            import shlex
             tokens = shlex.split(args)
             try:
                 tmp = dict([(tok, self.objs[tok]) for tok in tokens])
@@ -249,7 +249,6 @@ class rshell(cmd.Cmd):
     def do_read(self, args):
         """Read objects into memory."""
         if args:
-            import shlex
             tokens = shlex.split(args)
             path = tokens[0]
             if 'as' in tokens:  # destination var specified or not
