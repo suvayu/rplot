@@ -43,10 +43,31 @@ def set_ownership(methods):
     set_attribute(methods, '_creates', True)
 
 
+def py_next(iterator):
+    el = iterator.cpp_next()        # call C++ version of cls.next()
+    if el:
+        return el
+    else:
+        raise StopIteration
+
+
 _creators = [
     ROOT.TObject.Clone,
     ROOT.TFile.Open,
+    ROOT.RooAbsReal.clone,
+    ROOT.RooAbsData.correlationMatrix,
+    ROOT.RooAbsData.covarianceMatrix,
+    ROOT.RooAbsData.reduce,
+    ROOT.RooDataSet.binnedClone
 ]
+
+# add create* and plot* methods to _creators
+for typ in (ROOT.RooAbsReal, ROOT.RooAbsData):
+    matches = [attr for attr in vars(typ)
+               if attr.find('create') == 0 or attr.find('plot') == 0]
+    _creators.extend(map(lambda attr: getattr(typ, attr), matches))
+# cleanup temporary vars
+del matches, attr
 
 set_ownership(_creators)
 
@@ -55,5 +76,22 @@ _root_containers = [
     ROOT.TCollection
 ]
 
+_roofit_containers = [
+    ROOT.RooAbsCollection,
+    ROOT.RooLinkedList
+]
+
 # `if <item> in <container>:' construct
 set_attribute(_root_containers, '__contains__', 'FindObject')
+set_attribute(_roofit_containers, '__contains__', 'find')
+
+# # key access: obj[name]
+# set_attribute(_root_containers, '__getitem__', 'FindObject')
+# set_attribute(_roofit_containers, '__getitem__', 'find')
+
+# iteration for all RooFit containers
+set_attribute(_roofit_containers, '__iter__', 'fwdIterator')
+set_attribute(ROOT.RooFIter, 'cpp_next', 'next')  # save C++ verion of next
+set_attribute(ROOT.RooFIter, 'next', py_next)    # reassign python version
+set_attribute(ROOT.RooFIter, '__next__', 'next')  # python 3 compatibility
+del py_next
