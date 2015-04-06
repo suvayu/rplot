@@ -39,7 +39,7 @@ def set_attribute(clss, attr, value):
 
 
 def set_ownership(methods):
-    """Tell Python, caller owns returned object by setting `clsmethod._creates'"""
+    """Tell Python caller owns returned object, set `clsmethod._creates'."""
     set_attribute(methods, '_creates', True)
 
 
