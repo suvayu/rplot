@@ -26,6 +26,15 @@ def root_str(objs):
     return res
 
 
+# RooFit utilities
+def dst_iter(dst):
+    """RooAbsData iterator: generator to iterate over a RooDataSet"""
+    argset = dst.get()
+    for i in xrange(dst.numEntries()):
+        dst.get(i)
+        yield argset
+
+
 # histogram utilities
 def th1fill(hist, dim=1):
     """Return a TH1.Fill wrapper for use with map(..)."""
