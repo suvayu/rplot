@@ -223,3 +223,51 @@ class Rplot(object):
     def draw_graph(self, *args, **kwargs):
         """Same as draw_hist(..)."""
         return self.draw_hist(*args, **kwargs)
+
+
+def redirect2hist(pair):
+    """Scan and add expression, selection pair for redirects to histogram"""
+    import uuid
+    if pair[0].find('>>') < 0:
+        return ('{}>>hist{}'.format(pair[0], uuid.uuid4()), pair[1])
+    else:
+        return pair
+
+
+def parse_hist_name(expr):
+    """Return parsed histogram name"""
+    start, stop = expr.find('>', 2)+2, expr.find('(')
+    if stop > 0:      # has binning info
+        return expr[start:stop]
+    else:
+        return expr[start:]
+
+
+# TTree plotter
+class Tplot(object):
+    def __init__(self, tree, exprs):
+        """Initialise with tree and list of expressions
+
+        tree  -- TTree to plot from
+        exprs -- List of pairs of expression, selection expressions
+
+        """
+        assert(tree)
+        self.tree = tree
+        import numpy as np
+        self.shape = np.shape(exprs)
+        if 1 == len(self.shape):
+            exprs = [exprs]
+            self.shape = np.shape(exprs)
+        # ensure shape == (N, 2)
+        assert(2 == len(self.shape))
+        assert(2 == self.shape[1])
+        self.exprs = map(redirect2hist, exprs)
+
+    def fill_hists(self):
+        """Iterate over expressions and fill histograms"""
+        def _get_hist(expr):
+            self.tree.Draw(self.expr[0], self.expr[1], 'goff')
+            return ROOT.gROOT.FindObject(parse_hist_name(self.expr[0]))
+        self.hists = map(_get_hist, self.exprs)
+        return self.hists
