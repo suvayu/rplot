@@ -216,34 +216,4 @@ class Rplot(object):
     def draw_graph(self, *args, **kwargs):
         """Same as draw_hist(..)."""
         self.draw_hist(*args, **kwargs)
-
-    def draw_tree(self, tree, expr_sels, drawopts=''):
-        diff = len(expr_sels) - self.nplots
-        if diff > 0:
-            print('# exprs ({}) > # pads ({})!'
-                  .format(len(expr_sels), self.nplots))
-            return
-        elif diff < 0:
-            # insert blanks
-            expr_sels += [None] * (-diff)
-        if not self.canvas:
-            self.prep_canvas()
-        if isinstance(drawopts, str):
-            drawopts = [drawopts] * len(expr_sels)
-        if len(expr_sels) != len(drawopts):
-            print('# exprs ({}) ≠ # options ({})!'
-                  .format(len(expr_sels), len(drawopts)))
-            return
-        for i, expr_sel in enumerate(expr_sels):
-            pad = self.canvas.cd(i+1)
-            if not expr_sel:
-                pad.Clear()
-                continue
-            # FIXME: assumes (expr, sel), could also be (expr1, expr2)
-            # for plotting with 'same'
-            try:
-                expr, sel = expr_sel
-            except ValueError:
-                expr, sel = expr_sel, ''
-            tree.Draw(expr, sel, drawopts[i])
         return self.canvas
