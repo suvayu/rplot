@@ -245,15 +245,18 @@ def parse_hist_name(expr):
 
 # TTree plotter
 class Tplot(object):
-    def __init__(self, tree, exprs):
-        """Initialise with tree and list of expressions
-
-        tree  -- TTree to plot from
-        exprs -- List of pairs of expression, selection expressions
-
-        """
+    def __init__(self, tree):
+        """Initialise TTree plotter with tree"""
         assert(tree)
         self.tree = tree
+
+    @property
+    def exprs(self):
+        """List of (expression, selection) pairs"""
+        return self.exprs
+
+    @exprs.setter
+    def exprs(self, exprs):
         import numpy as np
         self.shape = np.shape(exprs)
         if 1 == len(self.shape):
@@ -263,6 +266,11 @@ class Tplot(object):
         assert(2 == len(self.shape))
         assert(2 == self.shape[1])
         self.exprs = map(redirect2hist, exprs)
+
+    @exprs.deleter
+    def exprs(self):
+        del self.shape
+        del self.exprs
 
     def fill_hists(self):
         """Iterate over expressions and fill histograms"""
