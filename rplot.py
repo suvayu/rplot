@@ -158,7 +158,7 @@ class Rplot(object):
             ymax += 0.03*ymax
         return (ymin, ymax)
 
-    def draw_same(self, plot, drawopts):
+    def draw_same(self, plot, drawopts, normalised=False):
         if self.shrink2fit:
             yrange = self.get_viewport(plot)
         if isinstance(drawopts, str):
@@ -175,9 +175,16 @@ class Rplot(object):
                 opts = '{} same'.format(opts)
             if self.style:
                 self.set_style(plottable, i)
-            plottable.Draw(opts)
+            if i > 0:
+                opts = '{} same'.format(drawopts[i])
+            else:
+                opts = drawopts[i]
+            if normalised:
+                plottable.DrawNormalized(opts)
+            else:
+                plottable.Draw(opts)
 
-    def draw_hist(self, plots, drawopts):
+    def draw_hist(self, plots, drawopts, normalised=False):
         diff = len(plots) - self.nplots
         if diff > 0:
             print('# plots ({}) > # pads ({})!'
@@ -208,9 +215,12 @@ class Rplot(object):
             if isplottable(plot):
                 if self.style:
                     self.set_style(plot, 0)
-                plot.Draw(drawopts[i])
+                if normalised:
+                    plot.DrawNormalized(drawopts[i])
+                else:
+                    plot.Draw(drawopts[i])
             else:
-                self.draw_same(plot, drawopts[i])
+                self.draw_same(plot, drawopts[i], normalised)
         return self.canvas
 
     def draw_graph(self, *args, **kwargs):
