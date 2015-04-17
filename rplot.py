@@ -109,6 +109,7 @@ class Rplot(object):
     stats = False
     stack = False
     shrink2fit = True
+    legend = []
 
     def __init__(self, xgrid=1, ygrid=1, width=None, height=None):
         if gROOT.IsBatch() and not (width and height):
@@ -122,6 +123,10 @@ class Rplot(object):
         if self.nplots > 1:
             self.canvas.Divide(*self.grid)
         return self.canvas
+
+    def add_legend(self, legend):
+        # Need true copies, otherwise all legends are the same
+        self.legend = [ROOT.TLegend(legend) for i in xrange(self.nplots)]
 
     def get_stack(self, plots):
         plots_s = [[] for i in xrange(len(plots))]
@@ -158,7 +163,7 @@ class Rplot(object):
             ymax += 0.03*ymax
         return (ymin, ymax)
 
-    def draw_same(self, plot, drawopts, normalised=False):
+    def draw_same(self, plot, drawopts, normalised=False, legend=None):
         if isinstance(drawopts, str):
             drawopts = [drawopts] * len(plot)
         if len(plot) != len(drawopts):
@@ -180,6 +185,8 @@ class Rplot(object):
                 plottable.DrawNormalized(opts)
             else:
                 plottable.Draw(opts)
+            if legend:  # FIXME: customisable legend type
+                legend.AddEntry(plottable, plottable.GetTitle(), 'l')
 
     def draw_hist(self, plots, drawopts, normalised=False):
         diff = len(plots) - self.nplots
@@ -209,6 +216,11 @@ class Rplot(object):
             if not plot:
                 pad.Clear()
                 continue
+            if self.legend:
+                legend = self.legend[i]
+                legend.Clear()
+            else:
+                legend = None
             if isplottable(plot):
                 if self.style:
                     self.set_style(plot, 0)
@@ -216,8 +228,12 @@ class Rplot(object):
                     plot.DrawNormalized(drawopts[i])
                 else:
                     plot.Draw(drawopts[i])
+                if legend:  # FIXME: customisable legend type
+                    legend.AddEntry(plot, plot.GetTitle(), 'l')
             else:
-                self.draw_same(plot, drawopts[i], normalised)
+                self.draw_same(plot, drawopts[i], normalised, legend)
+            if legend:
+                legend.Draw()
         return self.canvas
 
     def draw_graph(self, *args, **kwargs):
