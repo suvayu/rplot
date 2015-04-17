@@ -159,20 +159,17 @@ class Rplot(object):
         return (ymin, ymax)
 
     def draw_same(self, plot, drawopts, normalised=False):
-        if self.shrink2fit:
-            yrange = self.get_viewport(plot)
         if isinstance(drawopts, str):
             drawopts = [drawopts] * len(plot)
         if len(plot) != len(drawopts):
             print('# plottables ≠ # options!')
             return
+        if self.shrink2fit:
+            yrange = self.get_viewport(plot)
         for i, plottable in enumerate(plot):
             if self.shrink2fit:
                 plottable.SetMinimum(yrange[0])
                 plottable.SetMaximum(yrange[1])
-            opts = drawopts[i]
-            if i > 0:
-                opts = '{} same'.format(opts)
             if self.style:
                 self.set_style(plottable, i)
             if i > 0:
@@ -225,5 +222,4 @@ class Rplot(object):
 
     def draw_graph(self, *args, **kwargs):
         """Same as draw_hist(..)."""
-        self.draw_hist(*args, **kwargs)
-        return self.canvas
+        return self.draw_hist(*args, **kwargs)
