@@ -54,7 +54,11 @@ class Tplot(object):
     def fill_hists(self):
         """Iterate over expressions and fill histograms"""
         def _get_hist(expr):
+            if not expr[0]:
+                return None
             self.tree.Draw(expr[0], expr[1], 'goff')
             return ROOT.gROOT.FindObject(parse_hist_name(expr[0]))
         self.hists = map(_get_hist, self._exprs)
         return self.hists
+
+empty_expr = ('', '')
