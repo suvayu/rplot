@@ -32,7 +32,7 @@ class Tplot(object):
     @property
     def exprs(self):
         """List of (expression, selection) pairs"""
-        return self.exprs
+        return self._exprs
 
     @exprs.setter
     def exprs(self, exprs):
@@ -44,17 +44,17 @@ class Tplot(object):
         # ensure shape == (N, 2)
         assert(2 == len(self.shape))
         assert(2 == self.shape[1])
-        self.exprs = map(redirect2hist, exprs)
+        self._exprs = map(redirect2hist, exprs)
 
     @exprs.deleter
     def exprs(self):
         del self.shape
-        del self.exprs
+        del self._exprs
 
     def fill_hists(self):
         """Iterate over expressions and fill histograms"""
         def _get_hist(expr):
-            self.tree.Draw(self.expr[0], self.expr[1], 'goff')
-            return ROOT.gROOT.FindObject(parse_hist_name(self.expr[0]))
-        self.hists = map(_get_hist, self.exprs)
+            self.tree.Draw(expr[0], expr[1], 'goff')
+            return ROOT.gROOT.FindObject(parse_hist_name(expr[0]))
+        self.hists = map(_get_hist, self._exprs)
         return self.hists
