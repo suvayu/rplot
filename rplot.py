@@ -164,6 +164,7 @@ class Rplot(object):
         return (ymin, ymax)
 
     def draw_same(self, plot, drawopts, normalised=False, legend=None):
+        plot = filter(None, plot)
         if isinstance(drawopts, str):
             drawopts = [drawopts] * len(plot)
         if len(plot) != len(drawopts):
