@@ -156,12 +156,15 @@ class Rdir(object):
 
         """
         rdir = self.get_dir(path)
-        if not rdir:
+        if not rdir:            # not a dir, or does not exist
             path = pathspec(path)
             # try again from one level up
             rdir = self.get_dir('{}:{}'.format(path.rfile, path.rpath_dirname))
             # FIXME: should be: while not rdir: keep trying
-            keys = [rdir.GetKey(path.rpath_basename)]
+            if rdir:            # exists, but not a directory
+                keys = [rdir.GetKey(path.rpath_basename)]
+            else:               # does not exist
+                keys = []
         else:
             keys = rdir.GetListOfKeys()
         keys = filter(None, keys)
