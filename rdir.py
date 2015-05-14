@@ -164,11 +164,12 @@ class Rdir(object):
             keys = [rdir.GetKey(path.rpath_basename)]
         else:
             keys = rdir.GetListOfKeys()
+        keys = filter(None, keys)
         if robj_t:
             keys = filter(lambda key: is_type(key, robj_t), keys)
         if robj_p:
             keys = filter(robj_p, keys)
-        return filter(None, keys)
+        return keys
 
     def ls_names(self, path=None, robj_t=None, robj_p=None):
         """Return list of key(s) names in path.
