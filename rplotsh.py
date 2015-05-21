@@ -13,7 +13,7 @@ from ROOT import gROOT, gDirectory
 
 import cmd
 import shlex
-from rdir import Rdir
+from rdir import Rdir, savepwd
 from utils import is_dir, root_str, NoExitArgParse
 from textwrap import dedent
 
@@ -170,9 +170,11 @@ class rshell(cmd.Cmd):
                     if not isinstance(isdir, ROOT.TFile):
                         # convert to TKey when TDirectoryFile
                         dirname = isdir.GetName()
-                        isdir.cd('..')
-                        isdir = filter(lambda k: k.GetName() == dirname,
-                                       gDirectory.GetListOfKeys())[0]
+                        with savepwd():
+                            isdir.cd('..')
+                            # read the latest cycle
+                            isdir = filter(lambda k: k.GetName() == dirname,
+                                           gDirectory.GetListOfKeys())[0]
                     self.print_key(isdir, self.get_ls_fmt(opts.showtype))
                     indent = ' '
                 keys = self.rdir_helper.ls(path)
