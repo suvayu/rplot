@@ -304,11 +304,6 @@ class rshell(cmd.Cmd):
         import code
         import readline
         import rlcompleter
-
-        # objects read into memory
-        from copy import deepcopy
-        myobjs = deepcopy(self.objs)
-
         # save, switch, and restore history files
         readline.write_history_file(__histfile__)
         readline.clear_history()  # remove rplotsh history from Python
@@ -317,9 +312,9 @@ class rshell(cmd.Cmd):
 
         # save and restore old completer
         rplotsh_completer = readline.get_completer()
-        readline.set_completer(rlcompleter.Completer(myobjs).complete)
+        readline.set_completer(rlcompleter.Completer(self.objs).complete)
         readline.parse_and_bind("tab: complete")
-        shell = code.InteractiveConsole(myobjs)
+        shell = code.InteractiveConsole(self.objs)
         shell.interact()
         readline.set_completer(rplotsh_completer)
 
