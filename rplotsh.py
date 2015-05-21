@@ -309,23 +309,6 @@ class rshell(cmd.Cmd):
         from copy import deepcopy
         myobjs = deepcopy(self.objs)
 
-        # useful ROOT globals
-        from ROOT import gROOT, gDirectory, gSystem, gPad, gStyle
-        # colours
-        from ROOT import (kBlack, kWhite, kGray, kViolet, kMagenta, kPink,
-                          kRed, kOrange, kYellow, kSpring, kGreen, kTeal,
-                          kCyan, kAzure, kBlue)
-        # markers
-        from ROOT import (kDot, kPlus, kStar, kCircle, kMultiply,
-                          kFullDotSmall, kFullDotMedium, kFullDotLarge,
-                          kFullCircle, kFullSquare, kFullTriangleUp,
-                          kFullTriangleDown, kOpenCircle, kOpenSquare,
-                          kOpenTriangleUp, kOpenTriangleDown)
-        ROOT_globals = dict([(k, v) for k, v in locals().iteritems()
-                             if k.startswith('g') or k.startswith('k')])
-
-        myobjs.update(ROOT_globals)
-
         # save, switch, and restore history files
         readline.write_history_file(__histfile__)
         readline.clear_history()  # remove rplotsh history from Python
