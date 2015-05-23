@@ -1,5 +1,5 @@
 # coding=utf-8
-"""Plotting interface TTree branches"""
+"""Selection interface for TTrees"""
 
 from fixes import ROOT
 
@@ -22,10 +22,10 @@ def parse_hist_name(expr):
         return expr[start:]
 
 
-# TTree plotter
-class Tplot(object):
+# TTree selector
+class Tselect(object):
     def __init__(self, tree):
-        """Initialise TTree plotter with tree"""
+        """Initialise TTree selector with tree"""
         assert(tree)
         self.tree = tree
 
