@@ -25,7 +25,7 @@ After the above steps, rplotsh should work from anywhere.
 
 
 * Tasks
-** rplotsh [0/3]
+** rplotsh [0/5]
 *** TODO Plotting
 : plot <object> | <list>
 *** TODO Plot settings
@@ -38,11 +38,27 @@ After the above steps, rplotsh should work from anywhere.
   : lsmem [memobj]...
 - [ ] move objects to container
   : mv <memobj>... <container>
+*** Inspect objects in the file
+: cat | print [-v] <obj>
+- For histograms, graphs, etc, show contents
+- For trees, show branch information
+*** TODO Tree commands
+- Inspect (range of) entries, branches
+- Looping constructs
+- Splicing trees into subtrees by selection.  How to do this?
+  - entrylist: book keeping
+  - clonetree: possible memory issues
+*** TODO RooFit commands
+- Browse workspace
 
-** Rplot [1/4]
+** Rplot [2/4]
 *** TODO Line style, width
 *** TODO Marker style, size
-*** TODO Automatic legends w/ smart placement
+*** DONE Automatic legends
+    CLOSED: [2015-05-23 Sat 11:50]
+    :LOGBOOK:
+    - State "WInP"       from "TODO"       [2015-05-23 Sat 11:49]
+    :END:
 *** DONE Stack
     CLOSED: [2014-09-16 Tue 16:22]
 
