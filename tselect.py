@@ -69,9 +69,9 @@ empty_expr = ('', '')
 
 
 class Tsplice(object):
-    """Splice ROOT trees by with entry lists
+    """Implements splices for ROOT trees.
 
-       This is not real splicing, it just emulates such behaviour by
+       This is not real splicing, it emulates the behaviour by
        maintaining an internal list of entry lists (e.g. TEventList,
        TEntryList, and TEntryListArray).
 
@@ -80,7 +80,7 @@ class Tsplice(object):
        >>> spliced_tree2 = mysplice.make_splice(name2, 'bar>42')
        >>> spliced_tree1 = mysplice.get_splice(name1)
 
-       The underlying try and the entry lists can be accessed like this
+       The underlying tree and the entry lists can be accessed like this
        >>> mysplice.tree          # underlying tree
        >>> mysplice.elists[name]  # entry lists are stored in a dictionary
 

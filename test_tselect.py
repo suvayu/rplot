@@ -52,7 +52,7 @@ class test_Tsplice(unittest.TestCase):
         self.rfile.Close()
 
     def test_reset(self):
-        self.splice.make_splice('sz_gt_10', ROOT.TCut('sz>5'))  # zero
+        self.splice.make_splice('sz_gt_5', ROOT.TCut('sz>5'))  # zero
         self.assertEqual(nplotted(self.splice.reset(), 'sz'), self.nentries)
 
     def test_make_splice(self):
