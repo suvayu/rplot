@@ -1,6 +1,8 @@
 # coding=utf-8
 """Selection interface for TTrees"""
 
+from __future__ import print_function
+
 from fixes import ROOT
 
 
@@ -8,7 +10,7 @@ def redirect2hist(pair):
     """Scan and add expression, selection pair for redirects to histogram"""
     import uuid
     if pair[0].find('>>') < 0:
-        return ('{}>>hist{}'.format(pair[0], uuid.uuid4()), pair[1])
+        return ('{}>>hist_{}'.format(pair[0], uuid.uuid4()), pair[1])
     else:
         return pair
 
@@ -16,6 +18,8 @@ def redirect2hist(pair):
 def parse_hist_name(expr):
     """Return parsed histogram name"""
     start, stop = expr.find('>', 2)+2, expr.find('(')
+    if expr[start] == '+':      # in case continue filling an existing hist
+        start += 1
     if stop > 0:      # has binning info
         return expr[start:stop]
     else:
@@ -62,3 +66,95 @@ class Tselect(object):
         return self.hists
 
 empty_expr = ('', '')
+
+
+class Tsplice(object):
+    """Splice ROOT trees by with entry lists
+
+       This is not real splicing, it just emulates such behaviour by
+       maintaining an internal list of entry lists (e.g. TEventList,
+       TEntryList, and TEntryListArray).
+
+       >>> mysplice = Tsplice(tree)
+       >>> spliced_tree1 = mysplice.make_splice(name1, 'foo<42')
+       >>> spliced_tree2 = mysplice.make_splice(name2, 'bar>42')
+       >>> spliced_tree1 = mysplice.get_splice(name1)
+
+       The underlying try and the entry lists can be accessed like this
+       >>> mysplice.tree          # underlying tree
+       >>> mysplice.elists[name]  # entry lists are stored in a dictionary
+
+    """
+
+    elists = {}
+
+    def __init__(self, tree):
+        self.tree = tree
+        self.elists['all'] = tree.GetEntryList()
+        self.current = self.elists['all']
+
+    def reset(self):
+        """Reset last splice to all entries"""
+        self.tree.SetEntryList(self.elists['all'])
+        self.current = self.elists['all']
+        return self.tree
+
+    def set_splice(self, elist):
+        """Set entry list as splice"""
+        if isinstance(elist, ROOT.TEventList):
+            self.tree.SetEventList(elist)
+        else:
+            self.tree.SetEntryList(elist)
+        self.current = elist
+        return self.tree
+
+    def make_splice(self, name, selection, listtype='entrylist', append=False):
+        """Create and return a spliced tree as per selection.
+
+           name      -- name of the splice
+
+           selection -- selection used to create the splice, maybe a
+                        selection string or a TCut object.
+
+           listtype  -- type of splice to create, supported types are
+                        TEventList, TEntryList, and TEntryListArray,
+                        selected by: '', 'entrylist', and
+                        'tentrylistarray', respectively.
+
+           append    -- if append is true, continue filling any existing
+                        splice.
+
+        """
+        import uuid
+        if not name:
+            name = 'elist_'.format(uuid.uuid4())
+        assert(name.find('>') < 0)  # forbid redirection in name
+        if not append and name in self.elists:
+            print('Tsplice: existing entry list will be overwritten!')
+        assert(selection)
+        listtype = listtype.lower()
+        # empty for TEventList
+        assert(listtype in ['', 'entrylist', 'entrylistarray'])
+
+        if append:
+            if self.current != self.elists['all']:
+                print('Tsplice: current splice was not `all\', double check!')
+            self.tree.Draw('>>+{}'.format(name), selection, listtype)
+        else:
+            self.tree.Draw('>>{}'.format(name), selection, listtype)
+        # should I also keep the selection?
+        self.elists[name] = ROOT.gDirectory.Get(name)
+        self.current = self.elists[name]
+        return self.set_splice(self.elists[name])
+
+    def get_splice(self, name):
+        """Apply and return a splice created earlier.
+
+           See make_splice(..) to look at how to make splices.
+
+        """
+        try:
+            self.set_splice(self.elists[name])  # set_splice fixes current
+        except KeyError:
+            print('unknown entry list:', name)
+        return self.tree
