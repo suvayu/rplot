@@ -110,6 +110,10 @@ class Tsplice(object):
         self.current = self.elists['all']
         return self.tree
 
+    def get_entries(self):
+        """Return the number of entries in current slice"""
+        return self.current.GetN()
+
     def set_splice(self, elist):
         """Set entry list as splice"""
         if isinstance(elist, ROOT.TEventList):

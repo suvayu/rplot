@@ -51,6 +51,10 @@ class test_Tsplice(unittest.TestCase):
     def tearDown(self):
         self.rfile.Close()
 
+    def test_get_entries(self):
+        tree = self.splice.make_splice('sz_gt_3', ROOT.TCut('sz>3'))  # 2/3
+        self.assertEqual(self.splice.get_entries(), nplotted(tree, 'sz'))
+
     def test_reset(self):
         self.splice.make_splice('sz_gt_5', ROOT.TCut('sz>5'))  # zero
         self.assertEqual(nplotted(self.splice.reset(), 'sz'), self.nentries)
