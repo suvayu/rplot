@@ -4,10 +4,7 @@ from fixes import ROOT
 from ROOT import gROOT, gDirectory
 
 import cmd
-import shlex
-from rdir import Rdir, savepwd
-from utils import is_dir, root_str, NoExitArgParse
-from textwrap import dedent
+from utils import NoExitArgParse
 
 
 class empty(cmd.Cmd):
@@ -51,6 +48,7 @@ class rshell(cmd.Cmd):
         return '{:.1f}{}'.format(Bytes, unit)
 
     def add_files(self, files):
+        from rdir import Rdir
         self.rdir_helper = Rdir(files)
 
     def set_histfile(self, histfile):
@@ -130,11 +128,13 @@ class rshell(cmd.Cmd):
 
     def print_memobjs(self, objs):
         """Print memory objects"""
+        from utils import root_str
         for name, obj in objs.iteritems():
             print '{}:\n  {}'.format(name, root_str(obj))
 
     def do_lsmem(self, args):
         """List objects read in memory"""
+        import shlex
         if args:
             tokens = shlex.split(args)
             try:
@@ -157,7 +157,10 @@ class rshell(cmd.Cmd):
 
     def do_ls(self, args=''):
         """List contents of a directory/file"""
-        opts = self.ls_parser.parse_args(args.split())
+        import shlex
+        from rdir import savepwd
+        # FIXME: use shlex to split
+        opts = self.ls_parser.parse_args(shlex.split(args))
         if opts.paths:          # w/ args
             for path in opts.paths:
                 isdir = self.rdir_helper.get_dir(path)
@@ -242,10 +245,14 @@ class rshell(cmd.Cmd):
 
         Note: Since `as\' is a keyword, an object named `as\' cannot be read
         simply.  Use a regex for that: e.g. a[s].'''
+        from textwrap import dedent
         print(dedent(msg))
 
     def do_read(self, args):
         """Read objects into memory."""
+        import shlex
+        # FIXME: use argparse to parse args
+        from utils import is_dir
         if args:
             tokens = shlex.split(args)
             path = tokens[0]
@@ -332,4 +339,5 @@ class rshell(cmd.Cmd):
         - file path: myfile.root:/dir1/dir2
 
         See also: TDirectoryFile::cd(..) in ROOT docs, `help pathspec\'.'''
+        from textwrap import dedent
         print(dedent(msg))
