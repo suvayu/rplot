@@ -69,12 +69,12 @@ class test_Rdir(unittest.TestCase):
 
         Structure:
 
-          /tmp/test_Rdir[0,1].root:/dira/hista
-          /tmp/test_Rdir[0,1].root:/dirb/histb
-          /tmp/test_Rdir[0,1].root:/dirc/histx
-          /tmp/test_Rdir[0,1].root:/dirc/dird/histy
-          /tmp/test_Rdir[0,1].root:/dirc/dird/dire/histz
-          /tmp/test_Rdir[0,1].root:/hist{0,1,2}
+          /tmp/test_Rdir{0,1}.root:/dira/hista
+          /tmp/test_Rdir{0,1}.root:/dirb/histb
+          /tmp/test_Rdir{0,1}.root:/dirc/histx
+          /tmp/test_Rdir{0,1}.root:/dirc/dird/histy
+          /tmp/test_Rdir{0,1}.root:/dirc/dird/dire/histz
+          /tmp/test_Rdir{0,1}.root:/hist{0,1,2}
 
         """
         self.fnames, self.rfiles = [], []
