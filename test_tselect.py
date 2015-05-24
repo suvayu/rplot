@@ -56,7 +56,6 @@ class test_Tsplice(unittest.TestCase):
         self.assertEqual(nplotted(self.splice.reset(), 'sz'), self.nentries)
 
     def test_make_splice(self):
-        self.splice.reset()
         cut = ROOT.TCut('foo>10')
         nexpected = nplotted(self.splice.reset(), 'foo', cut)
         tree = self.splice.make_splice('foo_gt_10', cut)
@@ -68,7 +67,6 @@ class test_Tsplice(unittest.TestCase):
         self.assertEqual(nexpected, nplotted(tree, 'bar'))
 
     def test_set_splice(self):
-        self.splice.reset()
         cut = ROOT.TCut('bar>0')
         self.splice.make_splice('pve_bar', cut)
         nexpected = nplotted(self.splice.reset(), 'bar', cut)
@@ -76,7 +74,6 @@ class test_Tsplice(unittest.TestCase):
         self.assertEqual(nexpected, nplotted(tree, 'bar'))
 
     def test_get_splice(self):
-        self.splice.reset()
         cut = ROOT.TCut('sz==4')
         self.splice.make_splice('sz_eq_4', cut)
         nexpected = nplotted(self.splice.reset(), 'sz', cut)
@@ -84,7 +81,6 @@ class test_Tsplice(unittest.TestCase):
         self.assertEqual(nexpected, nplotted(tree, 'sz'))
 
     def test_elistarray_splice(self):
-        self.splice.reset()
         # entries with 5 elements in data are guaranteed to pass, for
         # other entries, it passes when the passing element is < size,
         # which happens 3/5 times (when it is b/w 0-2), it is always
@@ -100,16 +96,19 @@ class test_Tsplice(unittest.TestCase):
         self.assertGreater(expected, 4*self.nentries/5)
 
     def test_append(self):
-        self.splice.reset()
+        """Also tests layered=False"""
         cut = ROOT.TCut('bar<0')
         self.splice.make_splice('bar', cut)
         cut = ROOT.TCut('bar>=0')
-        # this generates a warning, but adds no entries
-        self.splice.make_splice('bar', cut, append=True)
-        self.splice.reset()
-        # this works, and should add the rest of the entries
+        # this should add the rest of the entries
         tree = self.splice.make_splice('bar', cut, append=True)
         self.assertEqual(self.nentries, nplotted(tree, 'bar'))
+
+    def test_layered(self):
+        splice = Tsplice(self.splice.reset(), layered=True)
+        splice.make_splice('pos_bar', 'bar>0')
+        tree = splice.make_splice('data_gt_500', 'data>500')
+        self.assertLess(nplotted(tree, 'bar'), 0.5*self.nentries)
 
 
 class test_helpers(unittest.TestCase):

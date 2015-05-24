@@ -84,12 +84,23 @@ class Tsplice(object):
        >>> mysplice.tree          # underlying tree
        >>> mysplice.elists[name]  # entry lists are stored in a dictionary
 
+       There is also an advanced layered mode (off by default).  This
+       is useful when you want to `build up' selections by applying
+       them subsequently on top of one another.  To enable this mode,
+       you can pass the `layered' flag during initialisation.  If you
+       want to switch after the fact, you can set the layered property
+       to True.  Make sure to clean up the entry list if this is done.
+       Otherwise it is easy to loose track of which entry list was
+       created with what selection.
+
     """
 
     elists = {}
 
-    def __init__(self, tree):
+    def __init__(self, tree, layered=False):
+        """When layered is True, do not reset before creating new splices"""
         self.tree = tree
+        self.layered = layered
         self.elists['all'] = tree.GetEntryList()
         self.current = self.elists['all']
 
@@ -124,6 +135,9 @@ class Tsplice(object):
            append    -- if append is true, continue filling any existing
                         splice.
 
+           NOTE: when in layered mode, self.reset() is called before
+           creating a new slice.
+
         """
         import uuid
         if not name:
@@ -136,9 +150,12 @@ class Tsplice(object):
         # empty for TEventList
         assert(listtype in ['', 'entrylist', 'entrylistarray'])
 
+        if not self.layered:
+            self.reset()
         if append:
-            if self.current != self.elists['all']:
-                print('Tsplice: current splice was not `all\', double check!')
+            if self.layered and self.current != self.elists['all']:
+                print('Tsplice is in layered mode, last splice was not `all\','
+                      ' make sure this is what you want')
             self.tree.Draw('>>+{}'.format(name), selection, listtype)
         else:
             self.tree.Draw('>>{}'.format(name), selection, listtype)
