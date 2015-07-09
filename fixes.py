@@ -95,3 +95,12 @@ set_attribute(ROOT.RooFIter, 'cpp_next', 'next')  # save C++ verion of next
 set_attribute(ROOT.RooFIter, 'next', py_next)    # reassign python version
 set_attribute(ROOT.RooFIter, '__next__', 'next')  # python 3 compatibility
 del py_next
+
+
+# standalone iterator for RooAbsData FIXME: integrate into python properly
+def dst_iter(dst):
+    """Generator function to iterate over entries in a RooDataSet"""
+    argset = dst.get()
+    for i in xrange(dst.numEntries()):
+        dst.get(i)
+        yield argset
