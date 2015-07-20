@@ -139,7 +139,7 @@ class Tsplice(object):
            append    -- if append is true, continue filling any existing
                         splice.
 
-           NOTE: when in layered mode, self.reset() is called before
+           NOTE: when not in layered mode, self.reset() is called before
            creating a new slice.
 
         """
