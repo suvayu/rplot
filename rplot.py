@@ -117,6 +117,7 @@ class Rplot(object):
         self.grid = (xgrid, ygrid)
         self.nplots = xgrid * ygrid
         self.size = get_optimal_size(xgrid, ygrid, width, height)
+        ROOT.gStyle.SetOptTitle(0)
 
     def prep_canvas(self, name='canvas', title=''):
         self.canvas = ROOT.TCanvas(name, title, *self.size)
