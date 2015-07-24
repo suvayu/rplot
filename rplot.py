@@ -124,9 +124,10 @@ class Rplot(object):
             self.canvas.Divide(*self.grid)
         return self.canvas
 
-    def add_legend(self, legend):
+    def add_legend(self, legend, option):
         # Need true copies, otherwise all legends are the same
         self.legend = [ROOT.TLegend(legend) for i in xrange(self.nplots)]
+        self.leg_opt = option
 
     def get_stack(self, plots):
         plots_s = [[] for i in xrange(len(plots))]
@@ -186,8 +187,8 @@ class Rplot(object):
                 plottable.DrawNormalized(opts)
             else:
                 plottable.Draw(opts)
-            if legend:  # FIXME: customisable legend type
-                legend.AddEntry(plottable, plottable.GetTitle(), 'l')
+            if legend:
+                legend.AddEntry(plottable, plottable.GetTitle(), self.leg_opt)
 
     def draw_hist(self, plots, drawopts, normalised=False):
         diff = len(plots) - self.nplots
@@ -230,7 +231,7 @@ class Rplot(object):
                 else:
                     plot.Draw(drawopts[i])
                 if legend:  # FIXME: customisable legend type
-                    legend.AddEntry(plot, plot.GetTitle(), 'l')
+                    legend.AddEntry(plot, plot.GetTitle(), self.leg_opt)
             else:
                 self.draw_same(plot, drawopts[i], normalised, legend)
             if legend:
