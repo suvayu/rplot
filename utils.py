@@ -275,3 +275,13 @@ def file_hash(filename):
     with open(filename) as myfile:
         contents = myfile.read()
         return hashlib.md5(contents).hexdigest()
+
+
+def suppress_warnings():
+    import warnings
+    # NOTE: This is to ignore a warning from the call to
+    # TTreeFormula::EvalInstance().  One of the default arguments is a
+    # char**.  PyROOT does not provide converters for that, leading to the
+    # warning.  As long as this feature is not accessed, ignoring is safe.
+    warnings.filterwarnings(action='ignore', category=RuntimeWarning,
+                            message='creating converter for unknown type.*')
