@@ -2,7 +2,6 @@
 """Plotting interface for ROOT objects"""
 
 from fixes import ROOT
-from ROOT import gROOT
 
 # colours
 from ROOT import (kBlack, kGray, kMagenta, kRed, kOrange, kGreen,
@@ -112,7 +111,7 @@ class Rplot(object):
     legend = []
 
     def __init__(self, xgrid=1, ygrid=1, width=None, height=None):
-        if gROOT.IsBatch() and not (width and height):
+        if ROOT.gROOT.IsBatch() and not (width and height):
             raise ValueError('Width & height compulsory in batch mode!')
         self.grid = (xgrid, ygrid)
         self.nplots = xgrid * ygrid
