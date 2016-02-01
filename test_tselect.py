@@ -109,6 +109,8 @@ class test_Tsplice(unittest.TestCase):
         self.assertEqual(self.nentries, nplotted(tree, 'bar'))
 
     def test_layered(self):
+        # FIXME: buggy test, implicit assumptions about the number of
+        # selected candidates may not be always true
         splice = Tsplice(self.splice.reset(), layered=True)
         splice.make_splice('pos_bar', 'bar>0')
         tree = splice.make_splice('data_gt_500', 'data>500')
