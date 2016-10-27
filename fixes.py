@@ -101,6 +101,6 @@ del py_next
 def dst_iter(dst):
     """Generator function to iterate over entries in a RooDataSet"""
     argset = dst.get()
-    for i in xrange(dst.numEntries()):
+    for i in range(dst.numEntries()):
         dst.get(i)
         yield argset

@@ -66,7 +66,7 @@ def arrange(plottables, sep, reverse=False, predicate=None):
                   (list of plottables on one pad)
     """
     tmp = []
-    for i in xrange(0, len(plottables), sep):
+    for i in range(0, len(plottables), sep):
         l = plottables[i:i+sep]
         if reverse:
             l.reverse()
@@ -79,7 +79,7 @@ def arrange(plottables, sep, reverse=False, predicate=None):
 def partition(l, n):
     ll = len(l)
     reslen = ll/n + ll % n  # no of partitions + 1 (if remainder)
-    return [l[i*n: i*n+n] for i in xrange(reslen)]
+    return [l[i*n: i*n+n] for i in range(reslen)]
 
 
 # ROOT plotter
@@ -126,11 +126,11 @@ class Rplot(object):
 
     def add_legend(self, legend, option):
         # Need true copies, otherwise all legends are the same
-        self.legend = [ROOT.TLegend(legend) for i in xrange(self.nplots)]
+        self.legend = [ROOT.TLegend(legend) for i in range(self.nplots)]
         self.leg_opt = option
 
     def get_stack(self, plots):
-        plots_s = [[] for i in xrange(len(plots))]
+        plots_s = [[] for i in range(len(plots))]
         for i, plot in enumerate(plots):
             for j, plottable in enumerate(plot):
                 plots_s[i].append(plottable.Clone('{}_s'.format(

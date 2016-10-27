@@ -78,7 +78,7 @@ class test_Rdir(unittest.TestCase):
 
         """
         self.fnames, self.rfiles = [], []
-        for i in xrange(2):
+        for i in range(2):
             self.fnames.append('/tmp/test_Rdir{}.root'.format(i))
             self.rfiles.append(TFile.Open(self.fnames[-1], 'recreate'))
 
@@ -99,7 +99,7 @@ class test_Rdir(unittest.TestCase):
 
             map(lambda i:
                 f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10)),
-                xrange(3))
+                range(3))
 
         for f in self.rfiles:
             f.Write()

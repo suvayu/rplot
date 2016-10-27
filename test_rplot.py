@@ -30,7 +30,7 @@ def fill_hists(hists, fns):
 
 class test_arrange(unittest.TestCase):
     def setUp(self):
-        self.items = [[0, i] for i in xrange(16)]
+        self.items = [[0, i] for i in range(16)]
 
     def test_arrange(self):
         rearranged = arrange(self.items, 8)
@@ -45,9 +45,9 @@ class test_arrange(unittest.TestCase):
 
     def test_predicate(self):
         items_p = arrange(self.items, 8, predicate=lambda l: l.append(99))
-        ref = [99 for j in xrange(8)]
-        for i in xrange(2):
-            self.assertListEqual([items_p[i][j][-1] for j in xrange(8)], ref)
+        ref = [99 for j in range(8)]
+        for i in range(2):
+            self.assertListEqual([items_p[i][j][-1] for j in range(8)], ref)
 
 
 class test_Rplot(unittest.TestCase):
@@ -56,9 +56,9 @@ class test_Rplot(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         self.hists1 = [TH1F('hist{}'.format(i), '', 100, -10, 10)
-                       for i in xrange(16)]
+                       for i in range(16)]
         fns = [TF1('fn{}'.format(i), 'TMath::Gaus(x, {}, 1)'.format(i-8),
-                   -10, 10) for i in xrange(len(self.hists1))]
+                   -10, 10) for i in range(len(self.hists1))]
         fill_hists(self.hists1, fns)
         del fns
 
@@ -66,7 +66,7 @@ class test_Rplot(unittest.TestCase):
                        for s in ascii_lowercase[0:6]]
         fns = [TF1('fn{}'.format(i),
                    '{}*TMath::Gaus(x, 0, {})'.format(1./(i+1), i-3), -10, 10)
-               for i in xrange(len(self.hists2))]
+               for i in range(len(self.hists2))]
         fill_hists(self.hists2, fns)
         del fns
 

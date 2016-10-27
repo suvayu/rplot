@@ -18,7 +18,7 @@ def setUpModule():
     tree.Branch("sz", sz, "sz/I")
     data = np.array([1., 2., 3., 4., 5.], dtype=np.float32)
     tree.Branch("data", data, "data[sz]/F")
-    for i in xrange(1000):
+    for i in range(1000):
         foo[0] = np.random.lognormal(mean=np.pi)
         bar[0] = np.random.normal(loc=0)
         baz[0] = np.random.binomial(100, 0.3)

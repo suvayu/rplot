@@ -61,7 +61,7 @@ class Rtmpfile(object):
 def dst_iter(dst):
     """RooAbsData iterator: generator to iterate over a RooDataSet"""
     argset = dst.get()
-    for i in xrange(dst.numEntries()):
+    for i in range(dst.numEntries()):
         dst.get(i)
         yield argset
 
@@ -188,14 +188,14 @@ try:
                 shape[0] -= 2
         if err:
             shape.append(3 if asym else 2)
-        hiter = xrange(len(hist)) if overflow else xrange(1, len(hist)-1)
+        hiter = range(len(hist)) if overflow else range(1, len(hist)-1)
         val = np.array([thnbincontent(hist, i, err=err, asym=asym)
                         for i in hiter]).reshape(*shape)
         return val if pair else val.transpose()
 
     def thnbins(hist, edges=False, width=False, pair=False, overflow=False):
         """Return histogram bin centre or edges"""
-        hiter = xrange(len(hist)) if overflow else xrange(1, len(hist)-1)
+        hiter = range(len(hist)) if overflow else range(1, len(hist)-1)
         val = np.array([thnbincentre(hist, i, edges=edges, width=width)
                         for i in hiter])
         return val if pair else val.transpose()
@@ -227,7 +227,7 @@ except ImportError:
 def th1offset(hist, offset):
     """Offset non-empty histogram bins"""
     # only offset bins with content
-    for b in xrange(hist.GetXaxis().GetNbins()):
+    for b in range(hist.GetXaxis().GetNbins()):
         content = hist.GetBinContent(b)
         # FIXME: shouldn't work, comparing floats
         if content != 0.:
