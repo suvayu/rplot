@@ -45,9 +45,10 @@ class test_arrange(unittest.TestCase):
 
     def test_predicate(self):
         items_p = arrange(self.items, 8, predicate=lambda l: l.append(99))
-        ref = [99 for j in range(8)]
-        for i in range(2):
-            self.assertListEqual([items_p[i][j][-1] for j in range(8)], ref)
+        nplots = len(items_p)
+        ref = [99 for j in range(nplots)]
+        for i in range(nplots):
+            self.assertListEqual([l[-1] for l in items_p], ref)
 
 
 class test_Rplot(unittest.TestCase):
