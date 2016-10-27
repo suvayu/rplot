@@ -86,7 +86,7 @@ class test_Rplot(unittest.TestCase):
         plotter.draw_hist(self.plots, 'hist')
         plotter.canvas.Update()
         plotter.canvas.Print(__pngfile__)
-        self.assertEqual('25c6ff7ed5422880e47a0c50b0d6e044',
+        self.assertEqual('4002c3d71309db10d32fb4c9fe4a8655',
                          file_hash(__pngfile__))
 
     def test_stack(self):
@@ -97,5 +97,5 @@ class test_Rplot(unittest.TestCase):
         plotter.draw_hist(plots, 'hist')
         plotter.canvas.Update()
         plotter.canvas.Print(__pngfile__)
-        self.assertEqual('df05887dc179fc0097d0f01dfd9f23a8',
+        self.assertEqual('4d79678fbd2ce7c0c43220b572b5e695',
                          file_hash(__pngfile__))
