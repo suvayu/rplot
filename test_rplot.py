@@ -3,7 +3,6 @@ import os
 from fixes import ROOT
 from ROOT import TH1F, TF1
 from rplot import arrange, Rplot
-from utils import file_hash
 from string import ascii_lowercase
 
 __pngfile__ = '/tmp/test.png'
@@ -84,20 +83,35 @@ class test_Rplot(unittest.TestCase):
         del self.plots
 
     def test_overlay(self):
+        from ROOT import TFrame
         plotter = Rplot(2, 2, 1200, 800)
         plotter.draw_hist(self.plots, 'hist')
         plotter.canvas.Update()
-        plotter.canvas.Print(__pngfile__)
-        self.assertEqual('4002c3d71309db10d32fb4c9fe4a8655',
-                         file_hash(__pngfile__))
+        for i, plot in enumerate(self.plots):
+            pad = plotter.canvas.cd(i+1)
+            primitives = [pl for pl in pad.GetListOfPrimitives()
+                          if not isinstance(pl, TFrame)]
+            self.assertEqual(len(plot), len(primitives))
 
     def test_stack(self):
+        from ROOT import TFrame
         # splicing overwrites ROOT objects in memory
         plots = self.plots[2:]
         plotter = Rplot(2, 1, 1200, 400)
         plotter.stack = True
         plotter.draw_hist(plots, 'hist')
         plotter.canvas.Update()
-        plotter.canvas.Print(__pngfile__)
-        self.assertEqual('4d79678fbd2ce7c0c43220b572b5e695',
-                         file_hash(__pngfile__))
+        for i, plot in enumerate(plots):
+            pad = plotter.canvas.cd(i+1)
+            primitives = [pl for pl in pad.GetListOfPrimitives()
+                          if not isinstance(pl, TFrame)]
+            self.assertEqual(len(plot), len(primitives))
+            ref_counts = []
+            for j, pl in enumerate(plot):
+                count = pl.GetEntries()
+                if j > 0:
+                    count += ref_counts[-1]
+                ref_counts.append(count)
+            ref_counts.reverse()
+            self.assertListEqual(ref_counts, [pl.GetEntries()
+                                              for pl in primitives])
