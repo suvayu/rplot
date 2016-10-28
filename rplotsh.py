@@ -66,7 +66,7 @@ class rshell(cmd.Cmd):
             pathstr = line.split()[-1]
         else:
             pathstr = text
-        self.comp_f = map(lambda i: i.GetName() + ':', self.rdir_helper.files)
+        self.comp_f = [f.GetName() + ':' for f in self.rdir_helper.files]
         if self.pwd == gROOT and pathstr.find(':') < 0:
             completions = self.comp_f
         else:
@@ -293,7 +293,7 @@ class rshell(cmd.Cmd):
                 else:
                     objs = {newobj: objs[0]}  # only one element
             else:
-                objs = map(lambda obj: (obj.GetName(), obj), objs)
+                objs = [(obj.GetName(), obj) for obj in objs]
             self.save_obj(objs)
         else:
             print('Nothing to read!')

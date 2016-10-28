@@ -48,7 +48,7 @@ class Tselect(object):
         # ensure shape == (N, 2)
         assert(2 == len(self.shape))
         assert(2 == self.shape[1])
-        self._exprs = map(redirect2hist, exprs)
+        self._exprs = [redirect2hist(expr) for expr in exprs]
 
     @exprs.deleter
     def exprs(self):
@@ -62,7 +62,7 @@ class Tselect(object):
                 return None
             self.tree.Draw(expr[0], expr[1], '{} goff'.format(opts))
             return ROOT.gROOT.FindObject(parse_hist_name(expr[0]))
-        self.hists = map(_get_hist, self._exprs)
+        self.hists = [_get_hist(expr) for expr in self._exprs]
         return self.hists
 
 empty_expr = ('', '')

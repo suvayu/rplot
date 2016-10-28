@@ -82,7 +82,7 @@ class test_Rdir(unittest.TestCase):
             self.fnames.append('/tmp/test_Rdir{}.root'.format(i))
             self.rfiles.append(TFile.Open(self.fnames[-1], 'recreate'))
 
-        for i, f in enumerate(self.rfiles):
+        for f in self.rfiles:
             rdir = f.mkdir('dira')
             rdir.WriteTObject(ROOT.TH1C('hista', '', 10, 0, 10))
 
@@ -97,9 +97,8 @@ class test_Rdir(unittest.TestCase):
             rdir.cd('dird/dire')
             gDirectory.WriteTObject(ROOT.TH1C('histz', '', 10, 0, 10))
 
-            map(lambda i:
-                f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10)),
-                range(3))
+            for i in range(3):
+                f.WriteTObject(ROOT.TH1C('hist{}'.format(i), '', 10, 0, 10))
 
         for f in self.rfiles:
             f.Write()
@@ -133,6 +132,7 @@ class test_Rdir(unittest.TestCase):
             self.fail(msg='Prep for Rdir.get_dir() with relative path failed')
 
     def test_ls_full(self):
+        from functools import reduce
         rdir_helper = Rdir(self.fnames)
 
         keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:/dirb')
@@ -149,6 +149,7 @@ class test_Rdir(unittest.TestCase):
                         msg='Keys do not match')
 
     def test_ls_rel(self):
+        from functools import reduce
         rdir_helper = Rdir(self.fnames)
         rdir = rdir_helper.get_dir('/tmp/test_Rdir0.root:/dirc/dird/dire')
         if rdir.cd():
@@ -168,21 +169,20 @@ class test_Rdir(unittest.TestCase):
 
     def test_ls_names(self):
         rdir_helper = Rdir(self.fnames)
-        # FIXME: Is using assertItemsEqual(..) correct?  Does it
-        # compare elements, or just count?
         keys_t = rdir_helper.ls_names('/tmp/test_Rdir0.root:/hist0')
         keys_r = [rdir_helper.files[0].GetKey('hist0').GetName()]
-        self.assertItemsEqual(keys_r, keys_t)
+        self.assertListEqual(keys_r, keys_t)
 
         keys_t = rdir_helper.ls_names('/tmp/test_Rdir1.root')
         keys_r = [k.GetName() for k in rdir_helper.files[1].GetListOfKeys()]
-        self.assertItemsEqual(keys_r, keys_t)
+        self.assertListEqual(keys_r, keys_t)
 
     def test_read(self):
+        from functools import reduce
         rdir_helper = Rdir(self.fnames)
         objs_t = rdir_helper.read('/tmp/test_Rdir1.root')
         objs_r = [k.ReadObj() for k in rdir_helper.files[1].GetListOfKeys()]
-        # self.assertItemsEqual(objs_r, objs_t) # doesn't work'
+        # self.assertListEqual(objs_r, objs_t) # doesn't work'
         res = map(lambda i, j: i.GetName() == j.GetName(), objs_t, objs_r)
         self.assertTrue(reduce(lambda i, j: i and j, res),
                         msg='Keys do not match')
@@ -193,15 +193,16 @@ class test_Rdir(unittest.TestCase):
 
     def test_filter(self):
         rdir_helper = Rdir(self.fnames)
-        keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
-                                robj_t=ROOT.TDirectoryFile)
+        keys_t = [k for k in rdir_helper.ls('/tmp/test_Rdir0.root:',
+                                            robj_t=ROOT.TDirectoryFile)]
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
-                  if ROOT.TClass.GetClass(k.GetClassName()) \
+                  if ROOT.TClass.GetClass(k.GetClassName())
                   .InheritsFrom(ROOT.TDirectoryFile.Class())]
-        self.assertItemsEqual(keys_r, keys_t)
+        self.assertListEqual(keys_r, keys_t)
 
-        keys_t = rdir_helper.ls('/tmp/test_Rdir0.root:',
-                                robj_p=lambda k: k.GetName().find('hist') >= 0)
+        keys_t = [k for k in rdir_helper.ls(
+            '/tmp/test_Rdir0.root:',
+            robj_p=lambda k: k.GetName().find('hist') >= 0)]
         keys_r = [k for k in rdir_helper.files[0].GetListOfKeys()
                   if k.GetName().find('hist') >= 0]
-        self.assertItemsEqual(keys_r, keys_t)
+        self.assertListEqual(keys_r, keys_t)

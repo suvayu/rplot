@@ -39,9 +39,10 @@ class test_arrange(unittest.TestCase):
 
     def test_reverse(self):
         rearranged = arrange(self.items, 8)
-        map(lambda l: l.reverse(), rearranged)
+        for l in rearranged:
+            l.reverse()
         items_r = arrange(self.items, 8, reverse=True)
-        map(self.assertListEqual, rearranged, items_r)
+        self.assertListEqual(rearranged, items_r)
 
     def test_predicate(self):
         items_p = arrange(self.items, 8, predicate=lambda l: l.append(99))

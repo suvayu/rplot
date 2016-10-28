@@ -150,7 +150,7 @@ def thnbincentre(hist, i, edges=False, width=False):
         axes.append(hist.GetYaxis())
     else:
         axes.append(hist.GetZaxis())
-    res = map(lambda ax: taxisbincentre(ax, i, edges, width), axes)
+    res = [taxisbincentre(ax, i, edges, width) for ax in axes]
     return res[0] if len(res) == 1 else res
 
 # Numpy based utilities
