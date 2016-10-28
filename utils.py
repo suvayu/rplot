@@ -272,7 +272,7 @@ def _import_args(namespace, d={}):
 def file_hash(filename):
     """Calculate MD5 hash of file based on contents"""
     import hashlib
-    with open(filename) as myfile:
+    with open(filename, 'rb') as myfile:
         contents = myfile.read()
         return hashlib.md5(contents).hexdigest()
 
