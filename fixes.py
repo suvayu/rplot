@@ -67,7 +67,7 @@ for typ in (ROOT.RooAbsReal, ROOT.RooAbsData):
                if attr.find('create') == 0 or attr.find('plot') == 0]
     _creators.extend(map(lambda attr: getattr(typ, attr), matches))
 # cleanup temporary vars
-del matches, attr
+del matches, typ
 
 set_ownership(_creators)
 

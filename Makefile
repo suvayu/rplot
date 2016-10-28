@@ -1,4 +1,4 @@
-PYTHON	:= $(shell which python)
+PYTHON	:= $(shell which python3)
 
 TESTS	:= $(wildcard test_*.py)
 TESTS	:= $(TESTS:%.py=%)
